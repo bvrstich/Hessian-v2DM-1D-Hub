@@ -84,6 +84,8 @@ int main(void) {
 
          P.invert();
 
+
+
          //fill the Newton object with the correct information, and solve for Delta
          newton.construct(t,ham,P);
 
