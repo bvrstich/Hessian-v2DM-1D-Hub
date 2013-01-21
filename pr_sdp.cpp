@@ -43,8 +43,6 @@ int main(void) {
 
    TPTPM::init();
 
-   cout << TPTPM::gn() << endl;
-
    Gradient::init();
 
    Newton newton;
@@ -83,8 +81,6 @@ int main(void) {
          P.fill(rdm);
 
          P.invert();
-
-
 
          //fill the Newton object with the correct information, and solve for Delta
          newton.construct(t,ham,P);

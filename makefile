@@ -15,9 +15,12 @@ CPPSRC	= pr_sdp.cpp\
             Vector.cpp\
             RecMat.cpp\
             TPM.cpp\
+            SPM.cpp\
             SUP.cpp\
             EIG.cpp\
             TPTPM.cpp\
+            SPSPM.cpp\
+            TPSPM.cpp\
             Hessian.cpp\
             Gradient.cpp\
             Newton.cpp

@@ -247,8 +247,6 @@ ostream &operator<<(ostream &output,const Gradient &grad_p){
 
    int B,I,J;
 
-   int S;
-
    for(int i = 0;i < TPTPM::gn();++i){
 
       B = TPTPM::gtpmm2t(i,0);
