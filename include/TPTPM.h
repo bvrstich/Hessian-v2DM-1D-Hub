@@ -44,7 +44,7 @@ class TPTPM : public Matrix {
       using Matrix::operator();
 
       //access to the numbers in tp mode
-      double operator()(int S,int I,int J,int S_,int K,int L) const;
+      double operator()(int B,int I,int J,int B_,int K,int L) const;
 
       static int gn();
 

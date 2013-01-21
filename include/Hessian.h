@@ -42,12 +42,6 @@ class Hessian : public Matrix {
 
       using Matrix::operator();
 
-      //easy to access the numbers, in sp mode
-      double operator()(int a,int b,int c,int d,int e,int z,int t,int h) const;
-
-      //access to the numbers in tp mode
-      double operator()(int I,int J,int K,int L) const;
-
       void I(const TPM &);
 
       void lagr();

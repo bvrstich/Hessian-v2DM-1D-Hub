@@ -11,18 +11,21 @@ using std::endl;
 double *Tools::x6j;
 double *Tools::x9j;
 
+int Tools::L;
 int Tools::M;
 int Tools::N;
 
 /**
  * initialize and allocate the static variables
- * @param M_in nr of orbitals
+ * @param L_in length of the chain
  * @param N_in nr of particles
  */
-void Tools::init(int M_in,int N_in){
+void Tools::init(int L_in,int N_in){
 
-   M = M_in;
+   L = L_in;
    N = N_in;
+
+   M = 2*L;
 
    x6j = new double [16];
 
@@ -84,11 +87,20 @@ double Tools::g9j(int S,int Z,int S_ab,int S_cd){
 }
 
 /**
- * @return nr of spatial orbitals
+ * @return dimension of sp Hilbert space
  */
 int Tools::gM(){
 
    return M;
+
+}
+
+/**
+ * @return lenght of the chain
+ */
+int Tools::gL(){
+
+   return L;
 
 }
 

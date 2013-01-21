@@ -31,44 +31,44 @@ Hessian::~Hessian(){ }
 
 ostream &operator<<(ostream &output,const Hessian &hess_p){
 
-   int S,I,J,S_,K,L;
+   int B,I,J,B_,K,L;
 
    int a,b,c,d;
    int e,z,t,h;
 
    for(int i = 0;i < TPTPM::gn();++i){
 
-      S = TPTPM::gtpmm2t(i,0);
+      B = TPTPM::gtpmm2t(i,0);
       I = TPTPM::gtpmm2t(i,1);
       J = TPTPM::gtpmm2t(i,2);
 
-      a = TPM::gt2s(S,I,0);
-      b = TPM::gt2s(S,I,1);
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
 
-      c = TPM::gt2s(S,J,0);
-      d = TPM::gt2s(S,J,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
 
       for(int j = i;j < TPTPM::gn();++j){
 
-         S_ = TPTPM::gtpmm2t(j,0); 
+         B_ = TPTPM::gtpmm2t(j,0); 
          K = TPTPM::gtpmm2t(j,1);
          L = TPTPM::gtpmm2t(j,2);
 
-         e = TPM::gt2s(S_,K,0);
-         z = TPM::gt2s(S_,K,1);
+         e = TPM::gt2s(B_,K,0);
+         z = TPM::gt2s(B_,K,1);
 
-         t = TPM::gt2s(S_,L,0);
-         h = TPM::gt2s(S_,L,1);
+         t = TPM::gt2s(B_,L,0);
+         h = TPM::gt2s(B_,L,1);
 
          if(fabs(hess_p(i,j)) < 1.0e-14){
 
-            output << i << "\t" << j << "\t|\t(" << S << ")\t" << I << "\t" << J << "\t(" << S_ << ")\t" << K << "\t" << L << "\t|\t" << 
+            output << i << "\t" << j << "\t|\t(" << B << ")\t" << I << "\t" << J << "\t(" << B_ << ")\t" << K << "\t" << L << "\t|\t" << 
 
                "(" << a << "," << b << "," << c << "," << d << ")\t(" << e << "," << z << "," << t << "," << h << ")\t|\t" << 0 << endl;
 
          }
          else{
-            output << i << "\t" << j << "\t|\t(" << S << ")\t" << I << "\t" << J << "\t(" << S_ << ")\t" << K << "\t" << L << "\t|\t" << 
+            output << i << "\t" << j << "\t|\t(" << B << ")\t" << I << "\t" << J << "\t(" << B_ << ")\t" << K << "\t" << L << "\t|\t" << 
 
                "(" << a << "," << b << "," << c << "," << d << ")\t(" << e << "," << z << "," << t << "," << h << ")\t|\t" << hess_p(i,j) << endl;
 
@@ -87,22 +87,26 @@ ostream &operator<<(ostream &output,const Hessian &hess_p){
  */
 void Hessian::I(const TPM &tpm){
 
-   int S,I,J,S_,K,L;
+   int B,I,J,B_,K,L;
+
+   int S;
 
    for(int i = 0;i < TPTPM::gn();++i){
 
-      S = TPTPM::gtpmm2t(i,0);
+      B = TPTPM::gtpmm2t(i,0);
       I = TPTPM::gtpmm2t(i,1);
       J = TPTPM::gtpmm2t(i,2);
 
+      S = TPM::gblock_char(B,0);
+
       for(int j = i;j < TPTPM::gn();++j){
 
-         S_ = TPTPM::gtpmm2t(j,0);
+         B_ = TPTPM::gtpmm2t(j,0);
          K = TPTPM::gtpmm2t(j,1);
          L = TPTPM::gtpmm2t(j,2);
 
-         if(S == S_)
-            (*this)(i,j) = 2.0 * (2.0*S + 1.0) * Gradient::gnorm(i) * Gradient::gnorm(j) * ( tpm(S,I,K) * tpm(S,J,L) + tpm(S,I,L) * tpm(S,J,K) );
+         if(B == B_)
+            (*this)(i,j) = 2.0 * (2.0*S + 1.0) * Gradient::gnorm(i) * Gradient::gnorm(j) * ( tpm(B,I,K) * tpm(B,J,L) + tpm(B,I,L) * tpm(B,J,K) );
          else
             (*this)(i,j) = 0.0;
 
@@ -117,13 +121,16 @@ void Hessian::I(const TPM &tpm){
  */
 void Hessian::lagr(){
 
-   int S,I,J;
+   int B,I,J;
+   int S;
 
    for(int i = 0;i < TPTPM::gn();++i){
 
-      S = TPTPM::gtpmm2t(i,0);
+      B = TPTPM::gtpmm2t(i,0);
       I = TPTPM::gtpmm2t(i,1);
       J = TPTPM::gtpmm2t(i,2);
+
+      S = TPM::gblock_char(B,0);
 
       if(I == J)
          (*this)(i,TPTPM::gn()) = std::sqrt(2.0*S + 1.0);

@@ -23,6 +23,8 @@ class Tools{
 
       static double g9j(int,int,int,int);
 
+      static int gL();
+
       static int gM();
 
       static int gN();
@@ -32,7 +34,10 @@ class Tools{
       //!nr of particles
       static int N;
 
-      //!nr of spatial orbitals
+      //!length of the chain
+      static int L;
+
+      //!number of sp-orbitals
       static int M;
 
       static double *x6j;

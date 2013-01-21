@@ -34,15 +34,16 @@ int main(void) {
 
    cout.precision(10);
 
-   const int M = 6;//dim sp hilbert space
-   const int N = 5;//nr of particles
+   const int L = 20;//dim sp hilbert space
+   const int N = 20;//nr of particles
 
-   Tools::init(M,N);
+   Tools::init(L,N);
 
    TPM::init();
 
    TPTPM::init();
-   SPSPM::init();
+
+   cout << TPTPM::gn() << endl;
 
    Gradient::init();
 
@@ -137,7 +138,6 @@ int main(void) {
 
    Gradient::clear();
 
-   SPSPM::clear();
    TPTPM::clear();
 
    TPM::clear();
