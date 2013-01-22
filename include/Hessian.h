@@ -46,6 +46,8 @@ class Hessian : public Matrix {
 
       void lagr();
 
+      void Q(const TPM &);
+
       static int gn();
       
       static void init();

@@ -54,7 +54,7 @@ void SPSPM::dpt2(double scale,const TPM &Q){
 
             int l = (a + k - e + Tools::gL())%Tools::gL();
 
-            (*this)(a,e) += Q(0,a,k,e,l) * Q(0,a,k,e,l) / ( TPM::gnorm(a,k) * TPM::gnorm(a,k) * TPM::gnorm(e,l) * TPM::gnorm(e,l) );
+            (*this)(a,e) += (Q(0,a,k,e,l) * Q(0,a,k,e,l) )/ ( TPM::gnorm(a,k) * TPM::gnorm(a,k) * TPM::gnorm(e,l) * TPM::gnorm(e,l) );
 
          }
 
@@ -65,7 +65,7 @@ void SPSPM::dpt2(double scale,const TPM &Q){
 
             int l = (a + k - e + Tools::gL())%Tools::gL();
 
-            (*this)(a,e) += Q(1,a,k,e,l) * Q(1,a,k,e,l);
+            ward += Q(1,a,k,e,l) * Q(1,a,k,e,l);
 
          }
 
@@ -75,5 +75,7 @@ void SPSPM::dpt2(double scale,const TPM &Q){
 
 
       }
+
+   this->symmetrize();
 
 }

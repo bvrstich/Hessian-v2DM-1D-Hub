@@ -63,6 +63,12 @@ class TPM : public BlockMatrix {
 
       void convert(const Gradient &);
 
+      //Q afbeelding en zijn inverse
+      void Q(int option,const TPM &);
+
+      //Q like afbeelding Q(A,B,C,tpm_d)
+      void Q(int option,double A,double B,double C,const TPM &);
+
       static int gdim(int);
 
       static int gt2s(int,int,int);
