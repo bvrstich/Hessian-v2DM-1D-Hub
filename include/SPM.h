@@ -8,6 +8,8 @@ using std::ostream;
 
 #include "Matrix.h"
 
+class PHM;
+
 /**
  * @author Brecht Verstichel
  * @date 11-05-2010\n\n
@@ -42,6 +44,8 @@ class SPM {
       double &operator[](int);
 
       void bar(double,const TPM &);
+
+      void bar(double,const PHM &);
 
    private:
 

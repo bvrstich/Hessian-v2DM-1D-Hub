@@ -12,6 +12,7 @@ using std::vector;
 #include "BlockMatrix.h"
 
 class SUP;
+class PHM;
 class Gradient;
 
 /**
@@ -68,6 +69,8 @@ class TPM : public BlockMatrix {
 
       //Q like afbeelding Q(A,B,C,tpm_d)
       void Q(int option,double A,double B,double C,const TPM &);
+
+      void G(const PHM &);
 
       static int gdim(int);
 

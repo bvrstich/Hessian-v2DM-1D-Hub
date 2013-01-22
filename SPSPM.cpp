@@ -79,3 +79,10 @@ void SPSPM::dpt2(double scale,const TPM &Q){
    this->symmetrize();
 
 }
+
+/**
+ * construct the doubly-traced direct product of two PHM matrices
+ */
+void SPSPM::dpt2(double scale,const PHM &phm){
+
+}

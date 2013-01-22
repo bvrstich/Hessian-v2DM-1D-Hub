@@ -68,3 +68,10 @@ void TPSPM::dpt(double scale,const TPM &Q){
    }
 
 }
+
+/**
+ * construct the singly-traced antisymmetrized direct product of two PHM matrices
+ */
+void TPSPM::dpt(double scale,const PHM &phm){
+
+}

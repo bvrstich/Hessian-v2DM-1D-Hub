@@ -34,12 +34,13 @@ int main(void) {
 
    cout.precision(10);
 
-   const int L = 20;//dim sp hilbert space
-   const int N = 20;//nr of particles
+   const int L = 6;//dim sp hilbert space
+   const int N = 6;//nr of particles
 
    Tools::init(L,N);
 
    TPM::init();
+   PHM::init();
 
    TPTPM::init();
 
@@ -138,6 +139,7 @@ int main(void) {
 
    TPTPM::clear();
 
+   PHM::clear();
    TPM::clear();
 
    Tools::clear();

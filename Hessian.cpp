@@ -236,3 +236,66 @@ void Hessian::Q(const TPM &Q){
    }
 
 }
+
+/**
+ * construct the G part of the Hessian
+ */
+void Hessian::G(const PHM &G){
+
+   TPTPM dp;
+   dp.dp(G);
+
+   TPSPM dpt;
+   dpt.dpt(1.0/(Tools::gN() - 1.0),G);
+
+   SPSPM dpt2;
+   dpt2.dpt2(1.0/((Tools::gN() - 1.0)*(Tools::gN() - 1.0)),G);
+
+   int B,I,J,B_,K,L;
+
+   int S,S_;
+
+   //first store everything in ward, then multiply with norms and add to (*this)!
+   double ward;
+
+   int a,b,c,d;
+   int e,z,t,h;
+
+   int sign,sign_;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      S = TPM::gblock_char(B,0);
+
+      sign = 1 - 2*S;
+
+      I = TPTPM::gtpmm2t(i,1);
+      J = TPTPM::gtpmm2t(i,2);
+
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
+
+      for(int j = i;j < TPTPM::gn();++j){
+
+         B_ = TPTPM::gtpmm2t(j,0);
+
+         S_ = TPM::gblock_char(B_,0);
+
+         sign_ = 1 - 2*S_;
+
+         K = TPTPM::gtpmm2t(j,1);
+         L = TPTPM::gtpmm2t(j,2);
+
+         e = TPM::gt2s(B_,K,0);
+         z = TPM::gt2s(B_,K,1);
+         t = TPM::gt2s(B_,L,0);
+         h = TPM::gt2s(B_,L,1);
+
+      }
+   }
+
+}

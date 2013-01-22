@@ -183,3 +183,10 @@ int TPTPM::gtpmm2t(int i,int option){
    return tpmm2t[i][option];
 
 }
+
+/**
+ * construct the antisymmetrized direct product of two PHM matrices
+ */
+void TPTPM::dp(const PHM &phm){
+
+}

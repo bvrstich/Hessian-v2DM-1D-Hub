@@ -15,6 +15,8 @@ class Tools{
 
    public:
 
+      static int par(int);
+
       static void init(int,int);
 
       static void clear();

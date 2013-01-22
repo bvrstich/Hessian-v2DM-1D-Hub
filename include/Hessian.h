@@ -10,6 +10,8 @@ using std::vector;
 
 #include "Matrix.h"
 
+class PHM;
+
 /**
  * @author Brecht Verstichel
  * @date 23-11-2012\n\n
@@ -17,7 +19,6 @@ using std::vector;
  * Matrix, some special member functions and two lists that give the relationship between the sp and the tp 
  * basis.
  */
-
 class Hessian : public Matrix {
 
    /**
@@ -47,6 +48,8 @@ class Hessian : public Matrix {
       void lagr();
 
       void Q(const TPM &);
+
+      void G(const PHM &);
 
       static int gn();
       

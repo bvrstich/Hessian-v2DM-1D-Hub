@@ -10,6 +10,8 @@ using std::vector;
 
 #include "Matrix.h"
 
+class PHM;
+
 /**
  * @author Brecht Verstichel
  * @date 23-11-2012\n\n
@@ -43,6 +45,8 @@ class SPSPM : public Matrix {
       using Matrix::operator();
 
       void dpt2(double,const TPM &);
+
+      void dpt2(double,const PHM &);
 
    private:
 

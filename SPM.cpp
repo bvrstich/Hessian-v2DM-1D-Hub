@@ -104,4 +104,29 @@ void SPM::bar(double scale,const TPM &tpm){
 
 }
 
+/**
+ * Trace out a set of indices to create the "bar" matrix of a PHM, slight difference from the bar(TPM) function (normalization of the tp basisset).
+ * @param scale the factor u want the SPM to be scaled with
+ * @param phm the PHM out of which the SPM will be filled
+ */
+void SPM::bar(double scale,const PHM &phm){
+
+   for(int k = 0;k < Tools::gL();++k){
+
+      (*this)[k] = 0.0;
+
+      //S = 0
+      for(int p = 0;p < Tools::gL();++p)
+         (*this)[k] += phm(0,k,p,k,p);
+
+      //S = 1
+      for(int p = 0;p < Tools::gL();++p)
+         (*this)[k] += 3.0 * phm(1,k,p,k,p);
+
+      (*this)[k] *= 0.5 * scale;
+
+   }
+
+}
+
 /* vim: set ts=3 sw=3 expandtab :*/
