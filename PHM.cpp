@@ -230,7 +230,7 @@ void PHM::G(const TPM &tpm){
             //transform k_d to tpm sp-momentum:
             d = (-ph2s[B][j][1] + L)%L;
 
-            (*this)(B,i,j) = -Tools::g6j(0,0,0,S) * tpm(0,a,d,c,b) - 3.0 * Tools::g6j(0,0,1,S) * tpm(1,a,d,c,b) / ( TPM::gnorm(a,d) * TPM::gnorm(c,b) );
+            (*this)(B,i,j) = -Tools::g6j(0,0,0,S) * tpm(0,a,d,c,b) / ( TPM::gnorm(a,d) * TPM::gnorm(c,b) ) - 3.0 * Tools::g6j(0,0,1,S) * tpm(1,a,d,c,b);
 
          }
 
