@@ -85,4 +85,38 @@ void SPSPM::dpt2(double scale,const TPM &Q){
  */
 void SPSPM::dpt2(double scale,const PHM &phm){
 
+   for(int a = 0;a < Tools::gL();++a)
+      for(int e = a;e < Tools::gL();++e){
+
+         (*this)(a,e) = 0.0;
+
+         //first S = 0
+         for(int k = 0;k < Tools::gL();++k){
+
+            int l = (a + k - e + Tools::gL())%Tools::gL();
+
+            (*this)(a,e) += phm(0,a,k,e,l) * phm(0,a,k,e,l);
+
+         }
+
+         double ward = 0.0;
+
+         //then S = 1
+         for(int k = 0;k < Tools::gL();++k){
+
+            int l = (a + k - e + Tools::gL())%Tools::gL();
+
+            ward += phm(1,a,k,e,l) * phm(1,a,k,e,l);
+
+         }
+
+         (*this)(a,e) += 3.0 * ward;
+
+         (*this)(a,e) *= scale;
+
+
+      }
+
+   this->symmetrize();
+
 }

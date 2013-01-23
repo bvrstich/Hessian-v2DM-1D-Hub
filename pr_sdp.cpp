@@ -46,6 +46,24 @@ int main(void) {
 
    Gradient::init();
 
+   PHM phm;
+   phm.fill_Random();
+
+   ofstream out("../do_1D_hub/phm.in");
+   out.precision(15);
+
+   for(int B = 0;B < phm.gnr();++B)
+      for(int i = 0;i < phm.gdim(B);++i)
+         for(int j = i;j < phm.gdim(B);++j)
+            out << B << "\t" << i << "\t" << j << "\t" << phm(B,i,j) << endl;
+
+   Hessian H;
+   H = 0.0;
+
+   H.G(phm);
+   cout << H;
+
+/*
    Newton newton;
 
    //hamiltoniaan
@@ -63,7 +81,7 @@ int main(void) {
    int tot_iter = 0;
 
    //outer iteration: scaling of the potential barrier
-   //while(t > 1.0e-12){
+   while(t > 1.0e-12){
 
       cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
 
@@ -73,7 +91,7 @@ int main(void) {
 
       //inner iteration: 
       //Newton's method for finding the minimum of the current potential
-      //while(convergence > tolerance){
+      while(convergence > tolerance){
 
          ++nr_newton_iter;
 
@@ -98,7 +116,7 @@ int main(void) {
 
          convergence = a*a*delta.ddot(delta);
 
- //     }
+      }
 
       cout << nr_newton_iter << endl;
 
@@ -124,7 +142,7 @@ int main(void) {
 
       tot_iter += nr_newton_iter;
 
-//   }
+   }
 
    cout << endl;
 
@@ -134,7 +152,7 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-
+*/
    Gradient::clear();
 
    TPTPM::clear();

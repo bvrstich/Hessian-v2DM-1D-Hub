@@ -261,15 +261,11 @@ void Hessian::G(const PHM &G){
    int a,b,c,d;
    int e,z,t,h;
 
-   int sign,sign_;
-
    for(int i = 0;i < TPTPM::gn();++i){
 
       B = TPTPM::gtpmm2t(i,0);
 
       S = TPM::gblock_char(B,0);
-
-      sign = 1 - 2*S;
 
       I = TPTPM::gtpmm2t(i,1);
       J = TPTPM::gtpmm2t(i,2);
@@ -285,8 +281,6 @@ void Hessian::G(const PHM &G){
 
          S_ = TPM::gblock_char(B_,0);
 
-         sign_ = 1 - 2*S_;
-
          K = TPTPM::gtpmm2t(j,1);
          L = TPTPM::gtpmm2t(j,2);
 
@@ -294,6 +288,23 @@ void Hessian::G(const PHM &G){
          z = TPM::gt2s(B_,K,1);
          t = TPM::gt2s(B_,L,0);
          h = TPM::gt2s(B_,L,1);
+
+         ward = 2.0 * TPM::gnorm(a,b) * TPM::gnorm(c,d) * TPM::gnorm(e,z) * TPM::gnorm(t,h) * dp(i,j);
+
+         if(I == J){
+
+            if(K == L)
+               ward += dpt2(a,e) + dpt2(a,z) + dpt2(b,e) + dpt2(b,z);
+
+            ward -= TPM::gnorm(e,z) * TPM::gnorm(t,h) * ( dpt(j,a) +  dpt(j,b) );
+
+         }
+
+         if(K == L)
+            ward -= TPM::gnorm(a,b) * TPM::gnorm(c,d) * ( dpt(i,e) +  dpt(i,z) );
+
+         //the norms
+         (*this)(i,j) += ward * Gradient::gnorm(i) * Gradient::gnorm(j) * (2.0*S + 1.0) * (2.0*S_ + 1.0);
 
       }
    }

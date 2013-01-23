@@ -74,13 +74,23 @@ void TPSPM::dpt(double scale,const TPM &Q){
  */
 void TPSPM::dpt(double scale,const PHM &phm){
 
+   int L = Tools::gL();
+
+   double **pharray = new double * [2*L];
+
+   for(int B = 0;B < 2*L;++B)
+      pharray[B] = new double [L*L];
+
+   phm.convert(pharray);
+
    int B,I,J;
 
    int S;
 
    int sign;
 
-   int K,a,b,c,d;
+   int a,b,c,d;
+   int c_,d_;
 
    for(int i = 0;i < TPTPM::gn();++i){
 
@@ -90,7 +100,6 @@ void TPSPM::dpt(double scale,const PHM &phm){
       J = TPTPM::gtpmm2t(i,2);
 
       S = TPM::gblock_char(B,0);
-      K = TPM::gblock_char(B,1);
 
       sign = 1 - 2*S;
 
@@ -99,11 +108,48 @@ void TPSPM::dpt(double scale,const PHM &phm){
       c = TPM::gt2s(B,J,0);
       d = TPM::gt2s(B,J,1);
 
+      c_ = Tools::par(c);
+      d_ = Tools::par(d);
+
       for(int k = 0;k < Tools::gL();++k){
+
+         (*this)(i,k) = 0.0;
+
+         for(int Z = 0;Z < 2;++Z){
+
+            //(a,d,c,b)
+            int P = (a + d_)%L;
+
+            double ward = pharray[P + Z*L][a + k*L] * pharray[P + Z*L][c + k*L];
+
+            //(b,d,c,a)
+            P = (b + d_)%L;
+
+            ward += sign * pharray[P + Z*L][b + k*L] * pharray[P + Z*L][c + k*L];
+
+            //(a,c,d,b)
+            P = (a + c_)%L;
+
+            ward += sign * pharray[P + Z*L][a + k*L] * pharray[P + Z*L][d + k*L];
+
+            //(b,c,d,a)
+            P = (b + c_)%L;
+
+            ward += pharray[P + Z*L][b + k*L] * pharray[P + Z*L][d + k*L];
+
+            (*this)(i,k) += 2.0 * (2.0*Z + 1.0) * Tools::g6j(0,0,Z,S) * ward;
+
+         }
+
+         (*this)(i,k) *= scale;
 
       }
 
    }
 
+   for(int B = 0;B < 2*L;++B)
+      delete [] pharray[B];
+
+   delete [] pharray;
 
 }
