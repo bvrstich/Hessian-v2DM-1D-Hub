@@ -74,4 +74,36 @@ void TPSPM::dpt(double scale,const TPM &Q){
  */
 void TPSPM::dpt(double scale,const PHM &phm){
 
+   int B,I,J;
+
+   int S;
+
+   int sign;
+
+   int K,a,b,c,d;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      I = TPTPM::gtpmm2t(i,1);
+      J = TPTPM::gtpmm2t(i,2);
+
+      S = TPM::gblock_char(B,0);
+      K = TPM::gblock_char(B,1);
+
+      sign = 1 - 2*S;
+
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
+
+      for(int k = 0;k < Tools::gL();++k){
+
+      }
+
+   }
+
+
 }

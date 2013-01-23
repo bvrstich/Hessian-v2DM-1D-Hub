@@ -260,7 +260,7 @@ void PHM::convert(double **array) const {
 
       for(int a = 0;a < L;++a)
          for(int c = 0;c < L;++c)
-            array[B][a + c*L] = (*this)(S,a,(K - a)%L,c,(K - c)%L);
+            array[B][a + c*L] = (*this)(S,a,(K - a + L)%L,c,(K - c + L)%L);
 
    }
 
