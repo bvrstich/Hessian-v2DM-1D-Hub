@@ -310,3 +310,96 @@ void Hessian::G(const PHM &G){
    }
 
 }
+
+/**
+ * construct the T1 part of the Hessian matrix
+ */
+void Hessian::T(const DPM &T){
+
+   int N = Tools::gN();
+
+   DPM T2;
+   T2.squaresym(T);
+
+   TPM T2bar;
+   T2bar.bar(8.0/(N*(N - 1.0)),T2);
+
+   SPM T2barbar;
+   T2barbar.bar(1.0/(2*(N - 1.0)),T2bar);
+
+   double T2trace = 16 * T2.trace()/ (N*N*(N - 1.0)*(N - 1.0));
+
+   TPTPM dpt2;
+   dpt2.dpt2(T);
+
+   TPSPM dpt3;
+   dpt3.dpt3(1.0/(N - 1.0),T);
+
+   SPSPM dpt4;
+   dpt4.dpt4(0.5/( (N - 1.0) * (N - 1.0) ),T);
+   int B,I,J,B_,K,L;
+
+   int S,S_;
+
+   //first store everything in ward, then multiply with norms and add to (*this)!
+   double ward;
+
+   int a,b,c,d;
+   int e,z,t,h;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      S = TPM::gblock_char(B,0);
+
+      I = TPTPM::gtpmm2t(i,1);
+      J = TPTPM::gtpmm2t(i,2);
+
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
+
+      for(int j = i;j < TPTPM::gn();++j){
+
+         B_ = TPTPM::gtpmm2t(j,0);
+
+         S_ = TPM::gblock_char(B_,0);
+
+         K = TPTPM::gtpmm2t(j,1);
+         L = TPTPM::gtpmm2t(j,2);
+
+         e = TPM::gt2s(B_,K,0);
+         z = TPM::gt2s(B_,K,1);
+         t = TPM::gt2s(B_,L,0);
+         h = TPM::gt2s(B_,L,1);
+
+         ward = 2.0 * dpt2(i,j);
+
+         if(I == J){
+
+            if(K == L){
+
+               ward += T2trace; 
+               
+               ward -= T2barbar[a] + T2barbar[b] + T2barbar[e] + T2barbar[z];
+
+               ward += dpt4(a,e) + dpt4(b,e) + dpt4(a,z) + dpt4(b,z);
+
+            }
+
+            ward += T2bar(S_,e,z,t,h) - dpt3(j,a) - dpt3(j,b);
+
+         }
+
+         if(K == L)
+            ward += T2bar(S,a,b,c,d) - dpt3(i,e) - dpt3(i,z);
+
+         //the norms
+         (*this)(i,j) += ward * Gradient::gnorm(i) * Gradient::gnorm(j) * (2.0*S + 1.0) * (2.0*S_ + 1.0);
+
+      }
+   }
+
+}

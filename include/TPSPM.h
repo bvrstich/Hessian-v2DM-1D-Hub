@@ -11,6 +11,7 @@ using std::vector;
 #include "RecMat.h"
 
 class PHM;
+class DPM;
 
 /**
  * @author Brecht Verstichel
@@ -39,6 +40,8 @@ class TPSPM : public RecMat {
       void dpt(double,const TPM &);
 
       void dpt(double,const PHM &);
+
+      void dpt3(double,const DPM &);
 
    private:
 

@@ -60,6 +60,8 @@ class DPM : public BlockMatrix {
       //maak een DPM van een TPM via de hat functie
       void hat(const TPM &);
 
+      void convert(double **) const;
+
       static int get_inco(int S,int S_ab,int a,int b,int c,int *i,double *coef);
 
       static int gblock_char(int,int);

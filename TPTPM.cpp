@@ -386,3 +386,104 @@ void TPTPM::dp(const PHM &phm){
    delete [] pharray;
 
 }
+
+/**
+ * construct a TPTPM object by double tracing the direct product of two DPM's
+ */
+void TPTPM::dpt2(const DPM &dpm){
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   double **dparray = new double * [2*L];
+
+   for(int B = 0;B < L;++B)//S = 1/2
+      dparray[B] = new double [4*L4];
+
+   for(int B = L;B < 2*L;++B)//S = 3/2
+      dparray[B] = new double [L4];
+
+   dpm.convert(dparray);
+
+   int B,B_;
+
+   int a,b,c,d;
+   int e,z,t,h;
+
+   int I_i,J_i,K_i,L_i;
+
+   int S,S_;
+
+   for(int i = 0;i < gn();++i){
+
+      B = tpmm2t[i][0];
+
+      S = TPM::gblock_char(B,0);
+
+      I_i = tpmm2t[i][1];
+      J_i = tpmm2t[i][2];
+
+      a = TPM::gt2s(B,I_i,0);
+      b = TPM::gt2s(B,I_i,1);
+      c = TPM::gt2s(B,J_i,0);
+      d = TPM::gt2s(B,J_i,1);
+
+      for(int j = i;j < gn();++j){
+
+         B_ = tpmm2t[j][0];
+
+         S_ = TPM::gblock_char(B_,0);
+
+         K_i = tpmm2t[j][1];
+         L_i = tpmm2t[j][2];
+
+         e = TPM::gt2s(B_,K_i,0);
+         z = TPM::gt2s(B_,K_i,1);
+         t = TPM::gt2s(B_,L_i,0);
+         h = TPM::gt2s(B_,L_i,1);
+
+         double ward = 0.0;
+
+         //first S = 1/2 part
+         for(int k = 0;k < L;++k){
+
+            int K_dp = (a + b + k)%L;
+
+            ward += dparray[K_dp][a + b*L + e*L2 + z*L3 + S*L4 + 2*S_*L4] * dparray[K_dp][c + d*L + t*L2 + h*L3 + S*L4 + 2*S_*L4]
+
+               + dparray[K_dp][a + b*L + t*L2 + h*L3 + S*L4 + 2*S_*L4] * dparray[K_dp][c + d*L + e*L2 + z*L3 + S*L4 + 2*S_*L4];
+
+         }
+
+         (*this)(i,j) = 2.0 / ( (2*S + 1.0)*(2*S_ + 1.0) ) * ward;
+
+         if(S == 1 && S_ == 1){//only then contribution from S = 3/2 part
+
+            ward = 0.0;
+
+            for(int k = 0;k < L;++k){
+
+               int K_dp = (a + b + k)%L;
+
+               ward += dparray[K_dp + L][a + b*L + e*L2 + z*L3] * dparray[K_dp + L][c + d*L + t*L2 + h*L3]
+
+                  + dparray[K_dp + L][a + b*L + t*L2 + h*L3] * dparray[K_dp + L][c + d*L + e*L2 + z*L3];
+
+            }
+
+            (*this)(i,j) += 4.0 / 9.0  * ward;
+
+         }
+
+      }
+   }
+
+   //remove the array
+   for(int B = 0;B < 2*L;++B)
+      delete [] dparray[B];
+
+   delete [] dparray;
+
+}

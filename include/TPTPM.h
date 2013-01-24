@@ -11,7 +11,7 @@ using std::vector;
 #include "Matrix.h"
 
 class PHM;
-
+class DPM;
 
 /**
  * @author Brecht Verstichel
@@ -49,6 +49,8 @@ class TPTPM : public Matrix {
       double operator()(int B,int I,int J,int B_,int K,int L) const;
 
       void dp(const PHM &);
+      
+      void dpt2(const DPM &);
 
       static int gn();
 

@@ -884,4 +884,44 @@ int DPM::gblock_char(int B,int option){
 
 }
 
+/**
+ * convert a PHM matrix to a double array for faster access to the number
+ */
+void DPM::convert(double **array) const {
+
+   int K;
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   for(int B = 0;B < L;++B){//first S = 1/2
+
+      K = block_char[B][1];
+
+      for(int S_ab = 0;S_ab < 2;++S_ab)
+         for(int a = 0;a < L;++a)
+            for(int b = 0;b < L;++b)
+               for(int S_de = 0;S_de < 2;++S_de)
+                  for(int d = 0;d < L;++d)
+                     for(int e = 0;e < L;++e)
+                        array[B][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = (*this)(0,S_ab,a,b,(K - a - b + 2*L)%L,S_de,d,e,(K - d - e + 2*L)%L);
+
+   }
+
+   for(int B = L;B < 2*L;++B){//then S = 3/2
+
+      K = block_char[B][1];
+
+      for(int a = 0;a < L;++a)
+         for(int b = 0;b < L;++b)
+            for(int d = 0;d < L;++d)
+               for(int e = 0;e < L;++e)
+                  array[B][a + b*L + d*L2 + e*L3] = (*this)(1,1,a,b,(K - a - b + 2*L)%L,1,d,e,(K - d - e + 2*L)%L);
+
+   }
+
+}
+
 /* vim: set ts=3 sw=3 expandtab :*/

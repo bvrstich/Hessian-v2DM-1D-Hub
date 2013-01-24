@@ -153,3 +153,110 @@ void TPSPM::dpt(double scale,const PHM &phm){
    delete [] pharray;
 
 }
+
+/**
+ * construct a TPSPM object by triple-tracing the direct product of two DPM objects
+ */
+void TPSPM::dpt3(double scale,const DPM &dpm){
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   double **dparray = new double * [2*L];
+
+   for(int B = 0;B < L;++B)//S = 1/2
+      dparray[B] = new double [4*L4];
+
+   for(int B = L;B < 2*L;++B)//S = 3/2
+      dparray[B] = new double [L4];
+
+   dpm.convert(dparray);
+
+   int B,I,J;
+
+   int S;
+
+   int a,b,c,d;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      I = TPTPM::gtpmm2t(i,1);
+      J = TPTPM::gtpmm2t(i,2);
+
+      S = TPM::gblock_char(B,0);
+
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
+
+      for(int e = 0;e < L;++e){
+
+         double ward = 0.0;
+
+         //first S = 1/2
+         for(int k = 0;k < L;++k){//abk and cdk
+
+            int K = (a + b + k)%L;
+
+            //first S_ep = 0
+            for(int p = 0;p < e;++p)
+               ward += dparray[K][a + b*L + e*L2 + p*L3 + S*L4] * dparray[K][c + d*L + e*L2 + p*L3 + S*L4];
+
+            ward += 2.0 * dparray[K][a + b*L + e*L2 + e*L3 + S*L4] * dparray[K][c + d*L + e*L2 + e*L3 + S*L4];
+
+            for(int p = e + 1;p < L;++p)
+               ward += dparray[K][a + b*L + e*L2 + p*L3 + S*L4] * dparray[K][c + d*L + e*L2 + p*L3 + S*L4];
+
+
+            //then S_ep = 1
+            for(int p = 0;p < e;++p)
+               ward += dparray[K][a + b*L + e*L2 + p*L3 + S*L4 + 2*L4] * dparray[K][c + d*L + e*L2 + p*L3 + S*L4 + 2*L4];
+
+            for(int p = e + 1;p < L;++p)
+               ward += dparray[K][a + b*L + e*L2 + p*L3 + S*L4 + 2*L4] * dparray[K][c + d*L + e*L2 + p*L3 + S*L4 + 2*L4];
+
+         }
+
+         (*this)(i,e) = 2.0/(2*S + 1.0) * ward;
+
+         //then S = 3/2, only when
+         if(S == 1){
+
+            ward = 0.0;
+
+            for(int k = 0;k < L;++k){//abk and cdk
+
+               int K = (a + b + k)%L;
+
+               //only S_ep = 1 term possible
+               for(int p = 0;p < e;++p)
+                  ward += dparray[K + L][a + b*L + e*L2 + p*L3] * dparray[K + L][c + d*L + e*L2 + p*L3];
+
+               for(int p = e + 1;p < L;++p)
+                  ward += dparray[K + L][a + b*L + e*L2 + p*L3] * dparray[K + L][c + d*L + e*L2 + p*L3];
+
+            }
+
+            (*this)(i,e) += 4.0/3.0 * ward;
+
+         }
+
+         (*this)(i,e) *= scale;
+
+      }
+
+   }
+
+   //remove the array
+   for(int B = 0;B < 2*L;++B)
+      delete [] dparray[B];
+
+   delete [] dparray;
+
+
+}
