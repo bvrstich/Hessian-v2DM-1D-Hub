@@ -200,7 +200,7 @@ void TPTPM::dp(const PHM &phm){
 
    int B,B_;
 
-   int sign;
+   int sign,sign_;
 
    int a,b,c,d;
    int e,z,t,h;
@@ -236,6 +236,8 @@ void TPTPM::dp(const PHM &phm){
 
          S_ = TPM::gblock_char(B_,0);
 
+         sign_ = 1 - 2*S_;
+
          K_i = tpmm2t[j][1];
          L_i = tpmm2t[j][2];
 
@@ -247,139 +249,133 @@ void TPTPM::dp(const PHM &phm){
          t_ = Tools::par(t); 
          h_ = Tools::par(h); 
 
-         if(S == S_){
+         (*this)(i,j) = 0.0;
 
-            (*this)(i,j) = 0.0;
+         int P = (a + d_)%L;
+         int P_ = Tools::par(P);
 
-            int P = (a + d_)%L;
-            int P_ = Tools::par(P);
+         //(a,d,c,b)_(e,h,t,z) and (b,c,d,a)_(z,t,h,e)
+         if(P == (e + h_)%L){
 
-            //(a,d,c,b)_(e,h,t,z) and (b,c,d,a)_(z,t,h,e)
-            if(P == (e + h_)%L){
+            for(int Z = 0;Z < 2;++Z){
 
-               for(int Z = 0;Z < 2;++Z){
+               (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + e*L] * pharray[P + Z*L][c + t*L]
 
-                  (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + e*L] * pharray[P + Z*L][c + t*L]
-                  
-                        + pharray[P + Z*L][a + t*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][b + z*L] * pharray[P_ + Z*L][d + h*L]
+                     + pharray[P + Z*L][a + t*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][b + z*L] * pharray[P_ + Z*L][d + h*L]
 
-                        + pharray[P_ + Z*L][b + h*L] * pharray[P_ + Z*L][d + z*L] ); 
-
-               }
-
-            }
-
-            //(a,d,c,b)_(z,h,t,e) and (b,c,d,a)_(e,t,h,z)
-            if(P == (z + h_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + z*L] * pharray[P + Z*L][c + t*L]
-
-                        + pharray[P + Z*L][a + t*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][b + e*L] * pharray[P_ + Z*L][d + h*L]
-
-                        + pharray[P_ + Z*L][b + h*L] * pharray[P_ + Z*L][d + e*L] ); 
-
-               }
-
-            }
-
-            //(a,d,c,b)_(e,t,h,z) and (b,c,d,a)_(z,h,t,e)
-            if(P == (e + t_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + e*L] * pharray[P + Z*L][c + h*L]
-
-                        + pharray[P + Z*L][a + h*L]* pharray[P + Z*L][c + e*L]  + pharray[P_ + Z*L][b + z*L] * pharray[P_ + Z*L][d + t*L]
-
-                        + pharray[P_ + Z*L][b + t*L] * pharray[P_ + Z*L][d + z*L] ); 
-
-               }
-
-            }
-
-            //(a,d,c,b)_(z,t,h,e) and (b,c,d,a)_(e,h,t,z)
-            if(P == (z + t_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + z*L] * pharray[P + Z*L][c + h*L]
-
-                        + pharray[P + Z*L][a + h*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][b + e*L] * pharray[P_ + Z*L][d + t*L]
-
-                        + pharray[P_ + Z*L][b + t*L] * pharray[P_ + Z*L][d + e*L] ); 
-
-               }
-
-            }
-
-            P = (b + d_)%L;
-            P_ = Tools::par(P);
-
-            //(b,d,c,a)_(e,h,t,z) and (a,c,d,b)_(z,t,h,e)
-            if(P == (e + h_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + e*L] * pharray[P + Z*L][c + t*L]
-                  
-                        + pharray[P + Z*L][b + t*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][a + z*L] * pharray[P_ + Z*L][d + h*L]
-
-                        + pharray[P_ + Z*L][a + h*L] * pharray[P_ + Z*L][d + z*L] ); 
-
-               }
-
-            }
-
-            //(b,d,c,a)_(z,h,t,e) and (a,c,d,b)_(e,t,h,z)
-            if(P == (z + h_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + z*L] * pharray[P + Z*L][c + t*L]
-
-                        + pharray[P + Z*L][b + t*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][a + e*L] * pharray[P_ + Z*L][d + h*L]
-
-                        + pharray[P_ + Z*L][a + h*L] * pharray[P_ + Z*L][d + e*L] ); 
-
-               }
-
-            }
-
-            //(b,d,c,a)_(e,t,h,z) and (a,c,d,b)_(z,h,t,e)
-            if(P == (e + t_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + e*L] * pharray[P + Z*L][c + h*L]
-
-                        + pharray[P + Z*L][b + h*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][a + z*L] * pharray[P_ + Z*L][d + t*L]
-
-                        + pharray[P_ + Z*L][a + t*L] * pharray[P_ + Z*L][d + z*L] ); 
-
-               }
-
-            }
-
-            //(b,d,c,a)_(z,t,h,e) and (a,c,d,b)_(e,h,t,z)
-            if(P == (z + t_)%L){
-
-               for(int Z = 0;Z < 2;++Z){
-
-                  (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + z*L] * pharray[P + Z*L][c + h*L]
-
-                        + pharray[P + Z*L][b + h*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][a + e*L] * pharray[P_ + Z*L][d + t*L]
-
-                        + pharray[P_ + Z*L][a + t*L] * pharray[P_ + Z*L][d + e*L] ); 
-
-               }
+                     + pharray[P_ + Z*L][b + h*L] * pharray[P_ + Z*L][d + z*L] ); 
 
             }
 
          }
-         else
-            (*this)(i,j) = 0.0;
+
+         //(a,d,c,b)_(z,h,t,e) and (b,c,d,a)_(e,t,h,z)
+         if(P == (z + h_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign_ * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + z*L] * pharray[P + Z*L][c + t*L]
+
+                     + pharray[P + Z*L][a + t*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][b + e*L] * pharray[P_ + Z*L][d + h*L]
+
+                     + pharray[P_ + Z*L][b + h*L] * pharray[P_ + Z*L][d + e*L] ); 
+
+            }
+
+         }
+
+         //(a,d,c,b)_(e,t,h,z) and (b,c,d,a)_(z,h,t,e)
+         if(P == (e + t_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign_ * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + e*L] * pharray[P + Z*L][c + h*L]
+
+                     + pharray[P + Z*L][a + h*L]* pharray[P + Z*L][c + e*L]  + pharray[P_ + Z*L][b + z*L] * pharray[P_ + Z*L][d + t*L]
+
+                     + pharray[P_ + Z*L][b + t*L] * pharray[P_ + Z*L][d + z*L] ); 
+
+            }
+
+         }
+
+         //(a,d,c,b)_(z,t,h,e) and (b,c,d,a)_(e,h,t,z)
+         if(P == (z + t_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][a + z*L] * pharray[P + Z*L][c + h*L]
+
+                     + pharray[P + Z*L][a + h*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][b + e*L] * pharray[P_ + Z*L][d + t*L]
+
+                     + pharray[P_ + Z*L][b + t*L] * pharray[P_ + Z*L][d + e*L] ); 
+
+            }
+
+         }
+
+         P = (b + d_)%L;
+         P_ = Tools::par(P);
+
+         //(b,d,c,a)_(e,h,t,z) and (a,c,d,b)_(z,t,h,e)
+         if(P == (e + h_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + e*L] * pharray[P + Z*L][c + t*L]
+
+                     + pharray[P + Z*L][b + t*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][a + z*L] * pharray[P_ + Z*L][d + h*L]
+
+                     + pharray[P_ + Z*L][a + h*L] * pharray[P_ + Z*L][d + z*L] ); 
+
+            }
+
+         }
+
+         //(b,d,c,a)_(z,h,t,e) and (a,c,d,b)_(e,t,h,z)
+         if(P == (z + h_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign * sign_ * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + z*L] * pharray[P + Z*L][c + t*L]
+
+                     + pharray[P + Z*L][b + t*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][a + e*L] * pharray[P_ + Z*L][d + h*L]
+
+                     + pharray[P_ + Z*L][a + h*L] * pharray[P_ + Z*L][d + e*L] ); 
+
+            }
+
+         }
+
+         //(b,d,c,a)_(e,t,h,z) and (a,c,d,b)_(z,h,t,e)
+         if(P == (e + t_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign * sign_ * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + e*L] * pharray[P + Z*L][c + h*L]
+
+                     + pharray[P + Z*L][b + h*L]* pharray[P + Z*L][c + e*L] + pharray[P_ + Z*L][a + z*L] * pharray[P_ + Z*L][d + t*L]
+
+                     + pharray[P_ + Z*L][a + t*L] * pharray[P_ + Z*L][d + z*L] ); 
+
+            }
+
+         }
+
+         //(b,d,c,a)_(z,t,h,e) and (a,c,d,b)_(e,h,t,z)
+         if(P == (z + t_)%L){
+
+            for(int Z = 0;Z < 2;++Z){
+
+               (*this)(i,j) += sign * (2*Z + 1.0) * Tools::g6j(0,0,Z,S) * Tools::g6j(0,0,Z,S_) * ( pharray[P + Z*L][b + z*L] * pharray[P + Z*L][c + h*L]
+
+                     + pharray[P + Z*L][b + h*L]* pharray[P + Z*L][c + z*L] + pharray[P_ + Z*L][a + e*L] * pharray[P_ + Z*L][d + t*L]
+
+                     + pharray[P_ + Z*L][a + t*L] * pharray[P_ + Z*L][d + e*L] ); 
+
+            }
+
+         }
 
       }
    }

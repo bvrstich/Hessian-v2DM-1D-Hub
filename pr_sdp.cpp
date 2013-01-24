@@ -32,10 +32,12 @@ using std::ofstream;
  */
 int main(void) {
 
+   srand(time(NULL));
+
    cout.precision(10);
 
-   const int L = 6;//dim sp hilbert space
-   const int N = 6;//nr of particles
+   const int L = 20;//dim sp hilbert space
+   const int N = 20;//nr of particles
 
    Tools::init(L,N);
 
@@ -45,39 +47,6 @@ int main(void) {
    TPTPM::init();
 
    Gradient::init();
-/*
-   SUP sup;
-   sup.fill_Random();
-
-   ofstream out("../do_1D_hub/sup.in");
-   out.precision(15);
-
-   //I
-   for(int B = 0;B < sup.gI().gnr();++B)
-      for(int i = 0;i < sup.gI().gdim(B);++i)
-         for(int j = i;j < sup.gI().gdim(B);++j)
-            out << B << "\t" << i << "\t" << j << "\t" << sup.gI()(B,i,j) << endl;
-   //Q
-   for(int B = 0;B < sup.gI().gnr();++B)
-      for(int i = 0;i < sup.gI().gdim(B);++i)
-         for(int j = i;j < sup.gI().gdim(B);++j)
-            out << B << "\t" << i << "\t" << j << "\t" << sup.gQ()(B,i,j) << endl;
-   //G
-   for(int B = 0;B < sup.gG().gnr();++B)
-      for(int i = 0;i < sup.gG().gdim(B);++i)
-         for(int j = i;j < sup.gG().gdim(B);++j)
-            out << B << "\t" << i << "\t" << j << "\t" << sup.gG()(B,i,j) << endl;
-
-   Hessian H;
-
-   H.I(sup.gI());
-
-   H.Q(sup.gQ());
-
-   H.G(sup.gG());
-
-   cout << H;
-*/
 
    Newton newton;
 
@@ -96,9 +65,9 @@ int main(void) {
    int tot_iter = 0;
 
    //outer iteration: scaling of the potential barrier
-   //while(t > 1.0e-12){
+   while(t > 1.0e-12){
 
- //     cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
+      cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
 
       int nr_newton_iter = 0;
 
@@ -106,7 +75,7 @@ int main(void) {
 
       //inner iteration: 
       //Newton's method for finding the minimum of the current potential
-      //while(convergence > tolerance){
+      while(convergence > tolerance){
 
          ++nr_newton_iter;
 
@@ -118,7 +87,7 @@ int main(void) {
 
          //fill the Newton object with the correct information, and solve for Delta
          newton.construct(t,ham,P);
-/*
+
          //dit wordt de stap:
          TPM delta;
          delta.convert(newton.gGradient());
@@ -131,7 +100,7 @@ int main(void) {
 
          convergence = a*a*delta.ddot(delta);
 
- //     }
+      }
 
       cout << nr_newton_iter << endl;
 
@@ -143,7 +112,7 @@ int main(void) {
       if(tolerance < 1.0e-12)
          tolerance = 1.0e-12;
 
-     //extrapolatie:
+      //extrapolatie:
       TPM extrapol(rdm);
 
       extrapol -= backup_rdm;
@@ -157,7 +126,7 @@ int main(void) {
 
       tot_iter += nr_newton_iter;
 
-//   }
+   }
 
    cout << endl;
 
@@ -167,7 +136,7 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-*/
+
    Gradient::clear();
 
    TPTPM::clear();
@@ -178,4 +147,5 @@ int main(void) {
    Tools::clear();
 
    return 0;
+
 }

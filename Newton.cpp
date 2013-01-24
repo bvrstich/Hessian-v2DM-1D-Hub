@@ -69,7 +69,6 @@ const Gradient &Newton::gGradient() const {
  */
 void Newton::construct(double t,const TPM &ham,const SUP &P){
 
-   //first construct the gradient
    gradient->construct(t,ham,P);
 
    //construct the p part of the hessian
@@ -92,8 +91,6 @@ void Newton::construct(double t,const TPM &ham,const SUP &P){
 #endif
    
    H->dscal(t);
-
-   cout << *H;
 
    //the constraint/lagrange multiplier part of the Hessian
    H->lagr();
