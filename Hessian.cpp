@@ -329,15 +329,31 @@ void Hessian::T(const DPM &T){
 
    double T2trace = 16 * T2.trace()/ (N*N*(N - 1.0)*(N - 1.0));
 
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   double **dparray = new double * [2*L];
+
+   for(int B = 0;B < L;++B)//S = 1/2
+      dparray[B] = new double [4*L4];
+
+   for(int B = L;B < 2*L;++B)//S = 3/2
+      dparray[B] = new double [L4];
+
+   T.convert(dparray);
+
    TPTPM dpt2;
-   dpt2.dpt2(T);
+   dpt2.dpt2(dparray);
 
    TPSPM dpt3;
-   dpt3.dpt3(1.0/(N - 1.0),T);
+   dpt3.dpt3(1.0/(N - 1.0),dparray);
 
    SPSPM dpt4;
-   dpt4.dpt4(0.5/( (N - 1.0) * (N - 1.0) ),T);
-   int B,I,J,B_,K,L;
+   dpt4.dpt4(0.5/( (N - 1.0) * (N - 1.0) ),dparray);
+
+   int B,I_i,J_i,B_,K_i,L_i;
 
    int S,S_;
 
@@ -353,13 +369,13 @@ void Hessian::T(const DPM &T){
 
       S = TPM::gblock_char(B,0);
 
-      I = TPTPM::gtpmm2t(i,1);
-      J = TPTPM::gtpmm2t(i,2);
+      I_i = TPTPM::gtpmm2t(i,1);
+      J_i = TPTPM::gtpmm2t(i,2);
 
-      a = TPM::gt2s(B,I,0);
-      b = TPM::gt2s(B,I,1);
-      c = TPM::gt2s(B,J,0);
-      d = TPM::gt2s(B,J,1);
+      a = TPM::gt2s(B,I_i,0);
+      b = TPM::gt2s(B,I_i,1);
+      c = TPM::gt2s(B,J_i,0);
+      d = TPM::gt2s(B,J_i,1);
 
       for(int j = i;j < TPTPM::gn();++j){
 
@@ -367,19 +383,19 @@ void Hessian::T(const DPM &T){
 
          S_ = TPM::gblock_char(B_,0);
 
-         K = TPTPM::gtpmm2t(j,1);
-         L = TPTPM::gtpmm2t(j,2);
+         K_i = TPTPM::gtpmm2t(j,1);
+         L_i = TPTPM::gtpmm2t(j,2);
 
-         e = TPM::gt2s(B_,K,0);
-         z = TPM::gt2s(B_,K,1);
-         t = TPM::gt2s(B_,L,0);
-         h = TPM::gt2s(B_,L,1);
+         e = TPM::gt2s(B_,K_i,0);
+         z = TPM::gt2s(B_,K_i,1);
+         t = TPM::gt2s(B_,L_i,0);
+         h = TPM::gt2s(B_,L_i,1);
 
          ward = 2.0 * dpt2(i,j);
 
-         if(I == J){
+         if(I_i == J_i){
 
-            if(K == L){
+            if(K_i == L_i){
 
                ward += T2trace; 
                
@@ -393,7 +409,7 @@ void Hessian::T(const DPM &T){
 
          }
 
-         if(K == L)
+         if(K_i == L_i)
             ward += T2bar(S,a,b,c,d) - dpt3(i,e) - dpt3(i,z);
 
          //the norms
@@ -401,5 +417,11 @@ void Hessian::T(const DPM &T){
 
       }
    }
+
+   //remove the array
+   for(int B = 0;B < 2*L;++B)
+      delete [] dparray[B];
+
+   delete [] dparray;
 
 }

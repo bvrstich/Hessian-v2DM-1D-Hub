@@ -62,6 +62,8 @@ class DPM : public BlockMatrix {
 
       void convert(double **) const;
 
+      void convert_fast(double **) const;
+
       static int get_inco(int S,int S_ab,int a,int b,int c,int *i,double *coef);
 
       static int gblock_char(int,int);

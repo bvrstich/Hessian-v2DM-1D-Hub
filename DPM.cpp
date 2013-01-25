@@ -924,4 +924,295 @@ void DPM::convert(double **array) const {
 
 }
 
+/**
+ * convert a DPM matrix to a double array for faster access to the number, fast conversion
+ */
+void DPM::convert_fast(double **array) const {
+
+   int K;
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   //first S = 1/2
+   for(int K = 0;K < L;++K){
+
+      //S_ab can be 0 or 1, first S_ab =  0
+      for(int a = 0;a < L;++a){
+
+         // (1) a == b
+         int c = (K - 2*a + 2*L)%L;
+
+         int i = s2dp[K][0][a][a][c];
+
+         //(2) a < b
+         for(int b = a + 1;b < L;++b){
+
+            int c = (K - a - b + 2*L)%L;
+
+            if(c < a){//c < a < b
+
+            }
+            else if(c == a){//a a < b
+
+            }
+            else if(c < b){//a < c < b
+
+            }
+            else if(c == b){//a < b  b
+
+            }
+            else{//a < b < c
+
+               int i = s2dp[K][0][a][b][c];
+
+            }
+
+         }
+
+      }
+
+   }
+
+   //then S = 3/2
+   for(int B = L;B < 2*L;++B){
+
+      K = block_char[B][1];
+
+      for(int a = 0;a < L;++a){
+
+         // (1) first a == b
+         for(int d = 0;d < L;++d)
+            for(int e = 0;e < L;++e)
+               array[B][a*(L + 1) + d*L2 + e*L3] = 0.0;
+
+         // (2) a < b
+         for(int b = a + 1;b < L;++b){
+
+            int c = (K - a - b + 2*L)%L;
+
+            if(c < a){
+
+               int i = s2dp[B][0][c][a][b];
+
+               for(int d = 0;d < L;++d){
+
+                  //(1) first d == e
+                  array[B][a + b*L + d*(L2 + L3)] = array[B][b + a*L + d*(L2 + L3)] = 0.0;
+
+                  //(2) d < e
+                  for(int e = d + 1;e < L;++e){
+
+                     int z = (K - d - e + 2*L)%L;
+
+                     if(z < d){//z < d < e
+
+                        int j = s2dp[B][0][z][d][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == d){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else if(z < e){//d < z < e
+
+                        int j = s2dp[B][0][d][z][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == e){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else{//d < e < z
+
+                        int j = s2dp[B][0][d][e][z];
+
+                        array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+
+                  }
+
+               }
+
+            }
+            else if(c == a){
+
+               for(int d = 0;d < L;++d)
+                  for(int e = 0;e < L;++e)
+                     array[B][a + b*L + d*L2 + e*L3] = array[B][b + a*L + d*L2 + e*L3] = 0.0; 
+
+            }
+            else if(c < b){
+
+               //add minus!
+               int i = s2dp[B][0][a][c][b];
+
+               for(int d = 0;d < L;++d){
+
+                  //(1) first d == e
+                  array[B][a + b*L + d*(L2 + L3)] = array[B][b + a*L + d*(L2 + L3)] = 0.0;
+
+                  //(2) d < e
+                  for(int e = d + 1;e < L;++e){
+
+                     int z = (K - d - e + 2*L)%L;
+
+                     if(z < d){//z < d < e
+
+                        int j = s2dp[B][0][z][d][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == d){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else if(z < e){//d < z < e
+
+                        int j = s2dp[B][0][d][z][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == e){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else{//d < e < z
+
+                        int j = s2dp[B][0][d][e][z];
+
+                        array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+
+                  }
+
+               }
+
+            }
+            else if(c == b){
+
+               for(int d = 0;d < L;++d)
+                  for(int e = 0;e < L;++e)
+                     array[B][a + b*L + d*L2 + e*L3] = array[B][b + a*L + d*L2 + e*L3] = 0.0;
+
+            }
+            else{//a < b < c
+
+               int i = s2dp[B][0][a][b][c];
+
+               for(int d = 0;d < L;++d){
+
+                  //(1) first d == e
+                  array[B][a + b*L + d*(L2 + L3)] = array[B][b + a*L + d*(L2 + L3)] = 0.0;
+
+                  //(2) d < e
+                  for(int e = d + 1;e < L;++e){
+
+                     int z = (K - d - e + 2*L)%L;
+
+                     if(z < d){//z < d < e
+
+                        int j = s2dp[B][0][z][d][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == d){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else if(z < e){//d < z < e
+
+                        int j = s2dp[B][0][d][z][e];
+
+                        array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+                     else if(z == e){
+
+                        array[B][a + b*L + d*L2 + e*L3] = 0.0;
+                        array[B][b + a*L + d*L2 + e*L3] = 0.0;
+                        array[B][a + b*L + e*L2 + d*L3] = 0.0;
+                        array[B][b + a*L + e*L2 + d*L3] = 0.0;
+
+                     }
+                     else{//d < e < z
+
+                        int j = s2dp[B][0][d][e][z];
+
+                        array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                        array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                        array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+                     }
+
+                  }
+
+               }
+
+            }
+
+         }
+
+      }
+
+   }
+
+}
+
 /* vim: set ts=3 sw=3 expandtab :*/

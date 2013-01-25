@@ -183,3 +183,65 @@ void SPSPM::dpt4(double scale,const DPM &dpm){
    this->symmetrize();
 
 }
+
+/**
+ * construct a SPSPM by quadruple tracing the direct product of two DPM's, input the array
+ */
+void SPSPM::dpt4(double scale,double **dparray){
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   for(int a = 0;a < L;++a)
+      for(int e = a;e < L;++e){
+
+         (*this)(a,e) = 0.0;
+
+         double ward = 0.0;
+
+         //first S = 1/2
+         for(int l = 0;l < L;++l)
+            for(int k = 0;k < L;++k){
+
+               int K = (a + l + k)%L;
+
+               for(int S_al = 0;S_al < 2;++S_al)
+                  for(int S_en = 0;S_en < 2;++S_en)
+                     for(int n = 0;n < L;++n){
+
+                        ward += dparray[K][a + l*L + e*L2 + n*L3 + S_al*L4 + 2*S_en*L4] * dparray[K][a + l*L + e*L2 + n*L3 + S_al*L4 + 2*S_en*L4]
+
+                           / ( TPM::gnorm(a,l) * TPM::gnorm(a,l) * TPM::gnorm(e,n) * TPM::gnorm(e,n) );
+
+
+                     }
+
+            }
+
+         (*this)(a,e) = 2.0 * ward;
+
+         ward = 0.0;
+
+         //then S = 3/2
+         for(int l = 0;l < L;++l)
+            for(int k = 0;k < L;++k){
+
+               int K = (a + l + k)%L;
+
+               for(int n = 0;n < L;++n)
+                  ward += dparray[K + L][a + l*L + e*L2 + n*L3] * dparray[K + L][a + l*L + e*L2 + n*L3];
+
+            }
+
+         (*this)(a,e) += 4.0 * ward;
+
+         //scale
+         (*this)(a,e) *= 0.5 * scale;
+
+      }
+
+   this->symmetrize();
+
+}
