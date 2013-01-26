@@ -1019,12 +1019,18 @@ void DPM::convert_fast(double **array) const {
                         coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
                         coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
 
+                        array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1) + coef_j2 * (*this)(K,i,j2);
+                        array[K][a*(1 + L) + e*L2 + d*L3 + 2*S_de*L4] = sign_de * array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4];
+
                      }
                      else if(z == d){//z == d < e
 
                         j1 = s2dp[K][0][z][d][e];
 
                         coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                        array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1);
+                        array[K][a*(1 + L) + e*L2 + d*L3 + 2*S_de*L4] = sign_de * array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4];
 
                      }
                      else if(z < e){//d < z < e
@@ -1035,6 +1041,9 @@ void DPM::convert_fast(double **array) const {
                         coef_i1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
                         coef_i2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
 
+                        array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1) + coef_j2 * (*this)(K,i,j2);
+                        array[K][a*(1 + L) + e*L2 + d*L3 + 2*S_de*L4] = sign_de * array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4];
+
                      }
                      else if(z == e){//d < z == e
 
@@ -1042,11 +1051,16 @@ void DPM::convert_fast(double **array) const {
 
                         coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
 
+                        array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1);
+                        array[K][a*(1 + L) + e*L2 + d*L3 + 2*S_de*L4] = sign_de * array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4];
 
                      }
                      else{//d < e < z
 
                         j = s2dp[K][S_de][d][e][z];
+
+                        array[K][a*(1 + L) + d*L2 + e*L3 + 2*S_de*L4] = (*this)(K,i,j);
+                        array[K][a*(1 + L) + e*L2 + d*L3 + 2*S_de*L4] = sign_de * (*this)(K,i,j);
 
                      }
 
