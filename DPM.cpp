@@ -931,6 +931,18 @@ void DPM::convert_fast(double **array) const {
 
    int K;
 
+   int i,j;
+   int i1,i2,j1,j2;
+   double coef_i1,coef_i2,coef_j1,coef_j2;
+
+   double SQ_2 = std::sqrt(2.0);
+   double SQ_3 = std::sqrt(3.0);
+
+   int sign_ab,sign_de;
+   double sqab,sqde;
+
+   int c,z;
+
    int L = Tools::gL();
    int L2 = L*L;
    int L3 = L2*L;
@@ -939,34 +951,161 @@ void DPM::convert_fast(double **array) const {
    //first S = 1/2
    for(int K = 0;K < L;++K){
 
-      //S_ab can be 0 or 1, first S_ab =  0
+      //S_ab can be 0 or 1
       for(int a = 0;a < L;++a){
 
-         // (1) a == b
-         int c = (K - 2*a + 2*L)%L;
+         // (1) a == b only when S_ab == 0
+         c = (K - 2*a + 2*L)%L;
 
-         int i = s2dp[K][0][a][a][c];
+         if(c == a){//everything zero!
 
-         //(2) a < b
-         for(int b = a + 1;b < L;++b){
+            for(int S_ab = 0;S_ab < 2;++S_ab)
+               for(int S_de = 0;S_de < 2;++S_de)
+                  for(int d = 0;d < L;++d)
+                     for(int e = 0;e < L;++e)
+                        array[K][a*(1 + L) + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = 0.0;
 
-            int c = (K - a - b + 2*L)%L;
+         }
+         else{
 
-            if(c < a){//c < a < b
+            //when S_ab == 1: all zero if a == b
+            for(int S_de = 0;S_de < 2;++S_de)
+               for(int d = 0;d < L;++d)
+                  for(int e = 0;e < L;++e)
+                     array[K][a*(1 + L) + d*L2 + e*L3 + L4 + 2*S_de*L4] = 0.0;
+
+            //index for S_ab == 0
+            i = s2dp[K][0][a][a][c];
+
+            //only S_ab == 0 terms remain to be filled
+            for(int d = 0;d < L;++d){
+
+               //(1) d == e only when S_de == 0
+               z = (K - 2*d + 2*L)%L;
+
+               if(z == d){//everything zero
+
+                  for(int S_de = 0;S_de < 2;++S_de)
+                     array[K][a*(1 + L) + d*(L2 + L3) + 2*S_de*L4] = 0.0;
+
+               }
+               else{
+
+                  //when S_de == 1: zero!
+                  array[K][a*(1 + L) + d*(L2 + L3) + 2*L4] = 0.0;
+
+                  //index for S_de == 0
+                  j = s2dp[K][0][d][d][z];
+
+                  array[K][a*(1 + L) + d*(L2 + L3)] = (*this)(K,i,j);
+
+               }
+
+               //(2) d < e, both S_de = 0 and 1
+               for(int S_de = 0;S_de < 2;++S_de){
+
+                  sqde = std::sqrt(2*S_de + 1.0);
+                  sign_de = 1 - 2*S_de;
+
+                  for(int e = d + 1;e < L;++e){
+
+                     z = (K - d - e + 2*L)%L;
+
+                     if(z < d){//z < d < e
+
+                        j1 = s2dp[K][0][z][d][e];
+                        j2 = s2dp[K][1][z][d][e];
+
+                        coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                        coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                     }
+                     else if(z == d){//z == d < e
+
+                        j1 = s2dp[K][0][z][d][e];
+
+                        coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                     }
+                     else if(z < e){//d < z < e
+
+                        j1 = s2dp[K][0][d][z][e];
+                        j2 = s2dp[K][1][d][z][e];
+
+                        coef_i1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                        coef_i2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                     }
+                     else if(z == e){//d < z == e
+
+                        j1 = s2dp[K][0][z][e][d];
+
+                        coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
+
+
+                     }
+                     else{//d < e < z
+
+                        j = s2dp[K][S_de][d][e][z];
+
+                     }
+
+                  }
+
+               }
 
             }
-            else if(c == a){//a a < b
 
-            }
-            else if(c < b){//a < c < b
+         }//end else of if a == b == c
 
-            }
-            else if(c == b){//a < b  b
+         //(2) a < b, both S_ab = 0 and 1
+         for(int S_ab = 0;S_ab < 2;++S_ab){
 
-            }
-            else{//a < b < c
+            sqab = std::sqrt(2*S_ab + 1.0);
+            sign_ab = 1 - 2*S_ab;
 
-               int i = s2dp[K][0][a][b][c];
+            for(int b = a + 1;b < L;++b){
+
+               c = (K - a - b + 2*L)%L;
+
+               if(c < a){//c < a < b
+
+                  i1 = s2dp[K][0][c][a][b];
+                  i2 = s2dp[K][1][c][a][b];
+
+                  coef_i1 = sqab * sign_ab * Tools::g6j(0,0,S_ab,0);
+                  coef_i2 = sqab * sign_ab * SQ_3 * Tools::g6j(0,0,S_ab,1);
+
+               }
+               else if(c == a){//a a < b
+
+                  i1 = s2dp[K][0][c][a][b];
+
+                  coef_i1 = SQ_2 * sqab * sign_ab * Tools::g6j(0,0,S_ab,0);
+
+               }
+               else if(c < b){//a < c < b
+
+                  i1 = s2dp[K][0][a][c][b];
+                  i2 = s2dp[K][1][a][c][b];
+
+                  coef_i1 = sqab * sign_ab * Tools::g6j(0,0,S_ab,0);
+                  coef_i2 = - sqab * sign_ab * SQ_3 * Tools::g6j(0,0,S_ab,1);
+
+               }
+               else if(c == b){//a < b  b
+
+                  i1 = s2dp[K][0][c][b][a];
+
+                  coef_i1 = SQ_2 * sqab * Tools::g6j(0,0,S_ab,0);
+
+
+               }
+               else{//a < b < c
+
+                  i = s2dp[K][S_ab][a][b][c];
+
+               }
 
             }
 
@@ -991,11 +1130,11 @@ void DPM::convert_fast(double **array) const {
          // (2) a < b
          for(int b = a + 1;b < L;++b){
 
-            int c = (K - a - b + 2*L)%L;
+            c = (K - a - b + 2*L)%L;
 
             if(c < a){
 
-               int i = s2dp[B][0][c][a][b];
+               i = s2dp[B][0][c][a][b];
 
                for(int d = 0;d < L;++d){
 
@@ -1005,11 +1144,11 @@ void DPM::convert_fast(double **array) const {
                   //(2) d < e
                   for(int e = d + 1;e < L;++e){
 
-                     int z = (K - d - e + 2*L)%L;
+                     z = (K - d - e + 2*L)%L;
 
                      if(z < d){//z < d < e
 
-                        int j = s2dp[B][0][z][d][e];
+                        j = s2dp[B][0][z][d][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1027,7 +1166,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else if(z < e){//d < z < e
 
-                        int j = s2dp[B][0][d][z][e];
+                        j = s2dp[B][0][d][z][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1045,7 +1184,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else{//d < e < z
 
-                        int j = s2dp[B][0][d][e][z];
+                        j = s2dp[B][0][d][e][z];
 
                         array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1069,7 +1208,7 @@ void DPM::convert_fast(double **array) const {
             else if(c < b){
 
                //add minus!
-               int i = s2dp[B][0][a][c][b];
+               i = s2dp[B][0][a][c][b];
 
                for(int d = 0;d < L;++d){
 
@@ -1079,11 +1218,11 @@ void DPM::convert_fast(double **array) const {
                   //(2) d < e
                   for(int e = d + 1;e < L;++e){
 
-                     int z = (K - d - e + 2*L)%L;
+                     z = (K - d - e + 2*L)%L;
 
                      if(z < d){//z < d < e
 
-                        int j = s2dp[B][0][z][d][e];
+                        j = s2dp[B][0][z][d][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1101,7 +1240,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else if(z < e){//d < z < e
 
-                        int j = s2dp[B][0][d][z][e];
+                        j = s2dp[B][0][d][z][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1119,7 +1258,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else{//d < e < z
 
-                        int j = s2dp[B][0][d][e][z];
+                        j = s2dp[B][0][d][e][z];
 
                         array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1142,7 +1281,7 @@ void DPM::convert_fast(double **array) const {
             }
             else{//a < b < c
 
-               int i = s2dp[B][0][a][b][c];
+               i = s2dp[B][0][a][b][c];
 
                for(int d = 0;d < L;++d){
 
@@ -1152,11 +1291,11 @@ void DPM::convert_fast(double **array) const {
                   //(2) d < e
                   for(int e = d + 1;e < L;++e){
 
-                     int z = (K - d - e + 2*L)%L;
+                     z = (K - d - e + 2*L)%L;
 
                      if(z < d){//z < d < e
 
-                        int j = s2dp[B][0][z][d][e];
+                        j = s2dp[B][0][z][d][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1174,7 +1313,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else if(z < e){//d < z < e
 
-                        int j = s2dp[B][0][d][z][e];
+                        j = s2dp[B][0][d][z][e];
 
                         array[B][a + b*L + d*L2 + e*L3] = -(*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
@@ -1192,7 +1331,7 @@ void DPM::convert_fast(double **array) const {
                      }
                      else{//d < e < z
 
-                        int j = s2dp[B][0][d][e][z];
+                        j = s2dp[B][0][d][e][z];
 
                         array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
                         array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
