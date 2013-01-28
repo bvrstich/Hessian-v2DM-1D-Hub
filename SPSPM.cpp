@@ -32,8 +32,8 @@ SPSPM::~SPSPM(){ }
 ostream &operator<<(ostream &output,const SPSPM &spmm_p){
 
    for(int a = 0;a < Tools::gL();++a)
-      for(int e = a;e < Tools::gL();++e)
-         output << a << "\t" << e << spmm_p(a,e) << endl;
+      for(int e = 0;e < Tools::gL();++e)
+         output << a << "\t" << e << "\t" << spmm_p(a,e) << endl;
 
    return output;
 

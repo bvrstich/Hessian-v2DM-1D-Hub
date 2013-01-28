@@ -85,6 +85,8 @@ int main(void) {
    
    cout << "dpw4'ed" << endl;
 
+   cout << spmm;
+
    //remove the array
    for(int B = 0;B < 2*L;++B)
       delete [] ppharray[B];
