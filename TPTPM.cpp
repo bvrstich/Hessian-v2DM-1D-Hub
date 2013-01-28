@@ -572,3 +572,24 @@ void TPTPM::dpt2(double **dparray){
    }
 
  }
+
+/**
+ * construct a TPTPM by double tracing the direct product of two PPHM matrices, already translated to 'array' for for faster access
+ */
+void TPTPM::dpt2_pph(double **ppharray){
+
+}
+
+/**
+ * construct a TPTPM by once tracing and once skew-tracing the direct product of two PPHM matrices, already translated to 'array' for for faster access
+ */
+void TPTPM::dptw(double **ppharray){
+
+}
+
+/**
+ * construct a TPTPM by twice skew-tracing the direct product of two PPHM matrices, already translated to 'array' for for faster access
+ */
+void TPTPM::dpw2(double **ppharray){
+
+}

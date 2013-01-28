@@ -9,6 +9,7 @@ using std::ostream;
 #include "Matrix.h"
 
 class PHM;
+class PPHM;
 
 /**
  * @author Brecht Verstichel
@@ -46,6 +47,8 @@ class SPM {
       void bar(double,const TPM &);
 
       void bar(double,const PHM &);
+
+      void bar(double,const PPHM &);
 
    private:
 

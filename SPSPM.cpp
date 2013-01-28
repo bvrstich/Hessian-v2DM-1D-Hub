@@ -245,3 +245,10 @@ void SPSPM::dpt4(double scale,double **dparray){
    this->symmetrize();
 
 }
+
+/**
+ * construct a SPSPM by quadruple skew-tracing the direct product of two PPHM's, input the array
+ */
+void SPSPM::dpw4(double scale,double **ppharray){
+
+}

@@ -425,3 +425,49 @@ void Hessian::T(const DPM &T){
    delete [] dparray;
 
 }
+
+/**
+ * construct the T2 part of the Hessian matrix
+ */
+void Hessian::T(const PPHM &T){
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   double **ppharray = new double * [2*L];
+
+   for(int B = 0;B < L;++B)//S = 1/2
+      ppharray[B] = new double [4*L4];
+
+   for(int B = L;B < 2*L;++B)//S = 3/2
+      ppharray[B] = new double [L4];
+
+   T.convert(ppharray);
+
+   TPTPM dpw2;
+   dpw2.dpw2(ppharray);
+
+   TPTPM dptw;
+   dptw.dptw(ppharray);
+
+   TPTPM dpt2;
+   dpt2.dpt2_pph(ppharray);
+
+   TPSPM dpw3;
+   dpw3.dpw3(2.0/(Tools::gN() - 1.0),ppharray);
+
+   TPSPM dptw2;
+   dptw2.dptw2(2.0/(Tools::gN() - 1.0),ppharray);
+
+   SPSPM dpw4;
+   dpw4.dpw4(1.0/( (Tools::gN() - 1.0)*(Tools::gN() - 1.0)),ppharray);
+
+   //remove the array
+   for(int B = 0;B < 2*L;++B)
+      delete [] ppharray[B];
+
+   delete [] ppharray;
+
+}

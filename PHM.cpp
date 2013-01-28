@@ -227,7 +227,7 @@ void PHM::G(const TPM &tpm){
 
             c = ph2s[B][j][0];
 
-            //transform k_d to tpm sp-momentum:
+            //transform d to tpm sp-momentum:
             d = (-ph2s[B][j][1] + L)%L;
 
             (*this)(B,i,j) = -Tools::g6j(0,0,0,S) * tpm(0,a,d,c,b) / ( TPM::gnorm(a,d) * TPM::gnorm(c,b) ) - 3.0 * Tools::g6j(0,0,1,S) * tpm(1,a,d,c,b);
@@ -263,6 +263,74 @@ void PHM::convert(double **array) const {
             array[B][a + c*L] = (*this)(S,a,(K - a + L)%L,c,(K - c + L)%L);
 
    }
+
+}
+
+/**
+ * The bar function that maps a PPHM object onto a PHM object by tracing away the first pair of incdices of the PPHM
+ * @param pphm Input PPHM object
+ */
+void PHM::bar(double scale,const PPHM &pphm){
+
+   int a,b,c,d;
+
+   double ward,hard;
+
+   int S;
+
+   for(int B = 0;B < gnr();++B){//loop over the blocks PHM
+
+      S = block_char[B][0];
+
+      for(int i = 0;i < gdim(B);++i){
+
+         a = ph2s[B][i][0];
+         b = ph2s[B][i][1];
+
+         for(int j = i;j < gdim(B);++j){
+
+            c = ph2s[B][j][0];
+            d = ph2s[B][j][1];
+
+            //init
+            (*this)(B,i,j) = 0.0;
+
+            //first the S = 1/2 block of the PPHM matrix
+            for(int S_ab = 0;S_ab < 2;++S_ab)
+               for(int S_de = 0;S_de < 2;++S_de){
+
+                  ward = 2.0 * std::sqrt( (2.0*S_ab + 1.0) * (2.0*S_de + 1.0) ) * Tools::g6j(0,0,S,S_ab) * Tools::g6j(0,0,S,S_de);
+
+                  for(int p = 0;p < Tools::gL();++p){
+
+                     hard = ward * pphm(0,S_ab,p,a,b,S_de,p,c,d);
+
+                     //norms
+                     if(p == a)
+                        hard *= std::sqrt(2.0);
+
+                     if(p == c)
+                        hard *= std::sqrt(2.0);
+
+                     (*this)(B,i,j) += hard;
+
+                  }
+
+               }
+
+            //then the S = 3/2 block
+            if(S == 1)
+               for(int p = 0;p < Tools::gL();++p)
+                  (*this)(B,i,j) += 4.0/3.0 * pphm(1,1,p,a,b,1,p,c,d);
+
+            (*this)(B,i,j) *= scale;
+
+         }
+      }
+
+   }
+
+   this->symmetrize();
 
 }
 

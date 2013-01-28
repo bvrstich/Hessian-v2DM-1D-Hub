@@ -350,3 +350,17 @@ void TPSPM::dpt3(double scale,double **dparray){
    }
 
 }
+
+/**
+ * construct a TPSPM object by triple skew-tracing the direct product of two PPHM objects, here the PPHM has already been transformed to a double **array
+ */
+void TPSPM::dpw3(double scale,double **ppharray){
+
+}
+
+/**
+ * construct a TPSPM object by once tracing, and twice skew-tracing the direct product of two PPHM objects, here the PPHM has already been transformed to a double **array
+ */
+void TPSPM::dptw2(double scale,double **ppharray){
+
+}

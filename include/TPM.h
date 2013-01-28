@@ -14,6 +14,7 @@ using std::vector;
 class SUP;
 class PHM;
 class DPM;
+class PPHM;
 class Gradient;
 
 /**
@@ -75,7 +76,11 @@ class TPM : public BlockMatrix {
 
       void T(const DPM &);
 
+      void T(const PPHM &);
+
       void bar(double,const DPM &);
+
+      void bar(double,const PPHM &);
 
       static int gdim(int);
 

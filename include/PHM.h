@@ -10,6 +10,8 @@ using std::vector;
 #include "BlockMatrix.h"
 #include "TPM.h"
 
+class PPHM;
+
 /**
  * @author Brecht Verstichel
  * @date 11-05-2010\n\n
@@ -51,6 +53,8 @@ class PHM : public BlockMatrix {
       void G(const TPM &);
 
       void convert(double **) const;
+
+      void bar(double,const PPHM &);
 
       static void init();
 

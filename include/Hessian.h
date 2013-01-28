@@ -12,6 +12,7 @@ using std::vector;
 
 class PHM;
 class DPM;
+class PPHM;
 
 /**
  * @author Brecht Verstichel
@@ -53,6 +54,8 @@ class Hessian : public Matrix {
       void G(const PHM &);
 
       void T(const DPM &);
+
+      void T(const PPHM &);
 
       static int gn();
       

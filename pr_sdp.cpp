@@ -35,14 +35,15 @@ int main(void) {
 
    cout.precision(10);
 
-   const int L = 6;//dim sp hilbert space
-   const int N = 6;//nr of particles
+   const int L = 20;//dim sp hilbert space
+   const int N = 20;//nr of particles
 
    Tools::init(L,N);
 
    TPM::init();
    PHM::init();
    DPM::init();
+   PPHM::init();
 
    TPTPM::init();
 
@@ -65,68 +66,68 @@ int main(void) {
    int tot_iter = 0;
 
    //outer iteration: scaling of the potential barrier
-   while(t > 1.0e-12){
+   //while(t > 1.0e-12){
 
-      cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
+   cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
 
-      int nr_newton_iter = 0;
+   int nr_newton_iter = 0;
 
-      double convergence = 1.0;
+   double convergence = 1.0;
 
-      //inner iteration: 
-      //Newton's method for finding the minimum of the current potential
-      while(convergence > tolerance){
+   //inner iteration: 
+   //Newton's method for finding the minimum of the current potential
+   //while(convergence > tolerance){
 
-         ++nr_newton_iter;
+   ++nr_newton_iter;
 
-         SUP P;
+   SUP P;
 
-         P.fill(rdm);
+   P.fill(rdm);
 
-         P.invert();
+   P.invert();
 
-         //fill the Newton object with the correct information, and solve for Delta
-         newton.construct(t,ham,P);
+   //fill the Newton object with the correct information, and solve for Delta
+   newton.construct(t,ham,P);
 
-         //dit wordt de stap:
-         TPM delta;
-         delta.convert(newton.gGradient());
+   //dit wordt de stap:
+   TPM delta;
+   delta.convert(newton.gGradient());
 
-         //line search
-         double a = delta.line_search(t,P,ham);
+   //line search
+   double a = delta.line_search(t,P,ham);
 
-         //rdm += a*delta;
-         rdm.daxpy(a,delta);
+   //rdm += a*delta;
+   rdm.daxpy(a,delta);
 
-         convergence = a*a*delta.ddot(delta);
+   convergence = a*a*delta.ddot(delta);
 
-      }
+   //}
 
-      cout << nr_newton_iter << endl;
+   cout << nr_newton_iter << endl;
 
-      t /= 2.0;
+   t /= 2.0;
 
-      //what is the tolerance for the newton method?
-      tolerance = 1.0e-5*t;
+   //what is the tolerance for the newton method?
+   tolerance = 1.0e-5*t;
 
-      if(tolerance < 1.0e-12)
-         tolerance = 1.0e-12;
+   if(tolerance < 1.0e-12)
+      tolerance = 1.0e-12;
 
-      //extrapolatie:
-      TPM extrapol(rdm);
+   //extrapolatie:
+   TPM extrapol(rdm);
 
-      extrapol -= backup_rdm;
+   extrapol -= backup_rdm;
 
-      //overzetten voor volgende stap
-      backup_rdm = rdm;
+   //overzetten voor volgende stap
+   backup_rdm = rdm;
 
-      double b = extrapol.line_search(t,rdm,ham);
+   double b = extrapol.line_search(t,rdm,ham);
 
-      rdm.daxpy(b,extrapol);
+   rdm.daxpy(b,extrapol);
 
-      tot_iter += nr_newton_iter;
+   tot_iter += nr_newton_iter;
 
-   }
+   //}
 
    cout << endl;
 
@@ -141,6 +142,7 @@ int main(void) {
 
    TPTPM::clear();
 
+   PPHM::clear();
    DPM::clear();
    PHM::clear();
    TPM::clear();
