@@ -51,6 +51,42 @@ int main(void) {
 
    Newton newton;
 
+   PPHM pphm;
+   pphm.fill_Random();
+
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   double **ppharray = new double * [2*L];
+
+   for(int B = 0;B < L;++B)//S = 1/2
+      ppharray[B] = new double [4*L4];
+
+   for(int B = L;B < 2*L;++B)//S = 3/2
+      ppharray[B] = new double [L4];
+
+   pphm.convert(ppharray);
+
+   cout << "converted" << endl;
+
+   TPTPM tpmm;
+   tpmm.dpt2_pph(ppharray);
+
+   cout << "dpt2'ed" << endl;
+
+   TPSPM tpspm;
+   tpspm.dptw2(1.0,ppharray);
+
+   cout << "dptw2'ed" << endl;
+
+   //remove the array
+   for(int B = 0;B < 2*L;++B)
+      delete [] ppharray[B];
+
+   delete [] ppharray;
+
+   /*
    //hamiltoniaan
    TPM ham;
    ham.hubbard(1.0);
@@ -111,7 +147,7 @@ int main(void) {
    tolerance = 1.0e-5*t;
 
    if(tolerance < 1.0e-12)
-      tolerance = 1.0e-12;
+   tolerance = 1.0e-12;
 
    //extrapolatie:
    TPM extrapol(rdm);
@@ -137,8 +173,8 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-
-   Gradient::clear();
+   */
+      Gradient::clear();
 
    TPTPM::clear();
 
