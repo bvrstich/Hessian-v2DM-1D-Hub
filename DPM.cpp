@@ -1114,8 +1114,8 @@ void DPM::convert_fast(double **array) const {
                         //index for S_de == 0
                         j = s2dp[K][0][d][d][z];
 
-                        array[K][a* + b*L + d*(L2 + L3) + S_ab*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
-                        array[K][b* + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a* + b*L + d*(L2 + L3) + S_ab*L4];
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a + b*L + d*(L2 + L3) + S_ab*L4];
 
                      }
 
@@ -1191,7 +1191,7 @@ void DPM::convert_fast(double **array) const {
 
                               j = s2dp[K][S_de][d][e][z];
 
-                              array[K][a + b*L + d*L2 + e*L3 + 2*S_de*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
                               array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
                               array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
                               array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
@@ -1212,6 +1212,116 @@ void DPM::convert_fast(double **array) const {
 
                   coef_i1 = SQ_2 * sqab * sign_ab * Tools::g6j(0,0,S_ab,0);
 
+                  for(int d = 0;d < L;++d){
+
+                     //(1) d == e only when S_de == 0
+                     z = (K - 2*d + 2*L)%L;
+
+                     if(z == d){//everything zero
+
+                        for(int S_de = 0;S_de < 2;++S_de){
+
+                           array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+                           array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+
+                        }
+
+                     }
+                     else{
+
+                        //when S_de == 1: zero!
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+
+                        //index for S_de == 0
+                        j = s2dp[K][0][d][d][z];
+
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4] = coef_i1 * (*this)(K,i1,j);
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a + b*L + d*(L2 + L3) + S_ab*L4];
+
+                     }
+
+                     //(2) d < e, both S_de = 0 and 1
+                     for(int S_de = 0;S_de < 2;++S_de){
+
+                        sqde = std::sqrt(2*S_de + 1.0);
+                        sign_de = 1 - 2*S_de;
+
+                        for(int e = d + 1;e < L;++e){
+
+                           z = (K - d - e + 2*L)%L;
+
+                           if(z < d){//z < d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+                              j2 = s2dp[K][1][z][d][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == d){//z == d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+
+                              coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z < e){//d < z < e
+
+                              j1 = s2dp[K][0][d][z][e];
+                              j2 = s2dp[K][1][d][z][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == e){//d < z == e
+
+                              j1 = s2dp[K][0][z][e][d];
+
+                              coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else{//d < e < z
+
+                              j = s2dp[K][S_de][d][e][z];
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * (*this)(K,i1,j);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+
+                        }
+
+                     }
+
+                  }//end loop over d
+
                }
                else if(c < b){//a < c < b
 
@@ -1221,6 +1331,121 @@ void DPM::convert_fast(double **array) const {
                   coef_i1 = sqab * sign_ab * Tools::g6j(0,0,S_ab,0);
                   coef_i2 = - sqab * sign_ab * SQ_3 * Tools::g6j(0,0,S_ab,1);
 
+                  for(int d = 0;d < L;++d){
+
+                     //(1) d == e only when S_de == 0
+                     z = (K - 2*d + 2*L)%L;
+
+                     if(z == d){//everything zero
+
+                        for(int S_de = 0;S_de < 2;++S_de){
+
+                           array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+                           array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+
+                        }
+
+                     }
+                     else{
+
+                        //when S_de == 1: zero!
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+
+                        //index for S_de == 0
+                        j = s2dp[K][0][d][d][z];
+
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a + b*L + d*(L2 + L3) + S_ab*L4];
+
+                     }
+
+                     //(2) d < e, both S_de = 0 and 1
+                     for(int S_de = 0;S_de < 2;++S_de){
+
+                        sqde = std::sqrt(2*S_de + 1.0);
+                        sign_de = 1 - 2*S_de;
+
+                        for(int e = d + 1;e < L;++e){
+
+                           z = (K - d - e + 2*L)%L;
+
+                           if(z < d){//z < d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+                              j2 = s2dp[K][1][z][d][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2)
+
+                                 + coef_i2 * coef_j1 * (*this)(K,i2,j1) + coef_i2 * coef_j2 * (*this)(K,i2,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == d){//z == d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+
+                              coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i2 * coef_j1 * (*this)(K,i2,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z < e){//d < z < e
+
+                              j1 = s2dp[K][0][d][z][e];
+                              j2 = s2dp[K][1][d][z][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2)
+
+                                 + coef_i2 * coef_j1 * (*this)(K,i2,j1) + coef_i2 * coef_j2 * (*this)(K,i2,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == e){//d < z == e
+
+                              j1 = s2dp[K][0][z][e][d];
+
+                              coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i2 * coef_j1 * (*this)(K,i2,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else{//d < e < z
+
+                              j = s2dp[K][S_de][d][e][z];
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * (*this)(K,i1,j) + coef_i2 * (*this)(K,i2,j);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+
+                        }
+
+                     }
+
+
+                  }//end loop over d
+
                }
                else if(c == b){//a < b  b
 
@@ -1228,11 +1453,230 @@ void DPM::convert_fast(double **array) const {
 
                   coef_i1 = SQ_2 * sqab * Tools::g6j(0,0,S_ab,0);
 
+                  for(int d = 0;d < L;++d){
+
+                     //(1) d == e only when S_de == 0
+                     z = (K - 2*d + 2*L)%L;
+
+                     if(z == d){//everything zero
+
+                        for(int S_de = 0;S_de < 2;++S_de){
+
+                           array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+                           array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+
+                        }
+
+                     }
+                     else{
+
+                        //when S_de == 1: zero!
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+
+                        //index for S_de == 0
+                        j = s2dp[K][0][d][d][z];
+
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4] = coef_i1 * (*this)(K,i1,j);
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a + b*L + d*(L2 + L3) + S_ab*L4];
+
+                     }
+
+                     //(2) d < e, both S_de = 0 and 1
+                     for(int S_de = 0;S_de < 2;++S_de){
+
+                        sqde = std::sqrt(2*S_de + 1.0);
+                        sign_de = 1 - 2*S_de;
+
+                        for(int e = d + 1;e < L;++e){
+
+                           z = (K - d - e + 2*L)%L;
+
+                           if(z < d){//z < d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+                              j2 = s2dp[K][1][z][d][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == d){//z == d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+
+                              coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z < e){//d < z < e
+
+                              j1 = s2dp[K][0][d][z][e];
+                              j2 = s2dp[K][1][d][z][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1) + coef_i1 * coef_j2 * (*this)(K,i1,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == e){//d < z == e
+
+                              j1 = s2dp[K][0][z][e][d];
+
+                              coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * coef_j1 * (*this)(K,i1,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else{//d < e < z
+
+                              j = s2dp[K][S_de][d][e][z];
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_i1 * (*this)(K,i1,j);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+
+                        }
+
+                     }
+
+                  }//end loop over d
 
                }
                else{//a < b < c
 
                   i = s2dp[K][S_ab][a][b][c];
+
+                  for(int d = 0;d < L;++d){
+
+                     //(1) d == e only when S_de == 0
+                     z = (K - 2*d + 2*L)%L;
+
+                     if(z == d){//everything zero
+
+                        for(int S_de = 0;S_de < 2;++S_de){
+
+                           array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+                           array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*S_de*L4] = 0.0;
+
+                        }
+
+                     }
+                     else{
+
+                        //when S_de == 1: zero!
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4 + 2*L4] = 0.0;
+
+                        //index for S_de == 0
+                        j = s2dp[K][0][d][d][z];
+
+                        array[K][a + b*L + d*(L2 + L3) + S_ab*L4] = (*this)(K,i,j);
+                        array[K][b + a*L + d*(L2 + L3) + S_ab*L4] = sign_ab * array[K][a + b*L + d*(L2 + L3) + S_ab*L4];
+
+                     }
+
+                     //(2) d < e, both S_de = 0 and 1
+                     for(int S_de = 0;S_de < 2;++S_de){
+
+                        sqde = std::sqrt(2*S_de + 1.0);
+                        sign_de = 1 - 2*S_de;
+
+                        for(int e = d + 1;e < L;++e){
+
+                           z = (K - d - e + 2*L)%L;
+
+                           if(z < d){//z < d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+                              j2 = s2dp[K][1][z][d][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1) + coef_j2 * (*this)(K,i,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == d){//z == d < e
+
+                              j1 = s2dp[K][0][z][d][e];
+
+                              coef_j1 = SQ_2 * sqde * sign_de * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z < e){//d < z < e
+
+                              j1 = s2dp[K][0][d][z][e];
+                              j2 = s2dp[K][1][d][z][e];
+
+                              coef_j1 = sqde * sign_de * Tools::g6j(0,0,S_de,0);
+                              coef_j2 = - sqde * sign_de * SQ_3 * Tools::g6j(0,0,S_de,1);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1) + coef_j2 * (*this)(K,i,j2);
+
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else if(z == e){//d < z == e
+
+                              j1 = s2dp[K][0][z][e][d];
+
+                              coef_j1 = SQ_2 * sqde * Tools::g6j(0,0,S_de,0);
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = coef_j1 * (*this)(K,i,j1);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+                           else{//d < e < z
+
+                              j = s2dp[K][S_de][d][e][z];
+
+                              array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = (*this)(K,i,j);
+                              array[K][b + a*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][a + b*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+                              array[K][b + a*L + e*L2 + d*L3 + S_ab*L4 + 2*S_de*L4] = sign_ab * sign_de * array[K][a + b*L + d*L2 + e*L3 + S_ab*L4 + 2*S_de*L4];
+
+                           }
+
+                        }
+
+                     }
+
+                  }//end loop over d
 
                }
 
@@ -1240,7 +1684,7 @@ void DPM::convert_fast(double **array) const {
 
          }
 
-      }
+      }//end loop over a
 
    }
 

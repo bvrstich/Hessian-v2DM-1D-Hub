@@ -342,7 +342,7 @@ void Hessian::T(const DPM &T){
    for(int B = L;B < 2*L;++B)//S = 3/2
       dparray[B] = new double [L4];
 
-   T.convert(dparray);
+   T.convert_fast(dparray);
 
    TPTPM dpt2;
    dpt2.dpt2(dparray);

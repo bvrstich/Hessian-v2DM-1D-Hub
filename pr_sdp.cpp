@@ -6,7 +6,6 @@
  * @author Brecht Verstichel, Ward Poelmans
  * @date 22-02-2010
  */
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -36,8 +35,8 @@ int main(void) {
 
    cout.precision(10);
 
-   const int L = 20;//dim sp hilbert space
-   const int N = 20;//nr of particles
+   const int L = 6;//dim sp hilbert space
+   const int N = 6;//nr of particles
 
    Tools::init(L,N);
 
@@ -49,50 +48,6 @@ int main(void) {
 
    Gradient::init();
 
-   DPM dpm;
-   dpm.fill_Random();
-
-   int L2 = L*L;
-   int L3 = L2*L;
-   int L4 = L3*L;
-
-   double **dparray = new double * [2*L];
-
-   for(int B = 0;B < L;++B)//S = 1/2
-      dparray[B] = new double [4*L4];
-
-   for(int B = L;B < 2*L;++B)//S = 3/2
-      dparray[B] = new double [L4];
-/*
-   dpm.convert(dparray);
-
-   ofstream out("first.out");
-   out.precision(10);
-
-   for(int K = 0;K < L;++K)
-      for(int a = 0;a < L;++a)
-         for(int b = 0;b < L;++b)
-            for(int c = 0;c < L;++c)
-               for(int d = 0;d < L;++d)
-                  out << K << "\t" << a << "\t" << b << "\t" << c << "\t" << d << "\t" << dparray[K + L][a + b*L + c*L2 + d*L3] << endl;
-*/
-
-   dpm.convert_fast(dparray);
-/*
-   for(int K = 0;K < L;++K)
-      for(int a = 0;a < L;++a)
-         for(int b = 0;b < L;++b)
-            for(int c = 0;c < L;++c)
-               for(int d = 0;d < L;++d)
-                  cout << K << "\t" << a << "\t" << b << "\t" << c << "\t" << d << "\t" << dparray[K + L][a + b*L + c*L2 + d*L3] << endl;
-*/
-   //remove the array
-   for(int B = 0;B < 2*L;++B)
-      delete [] dparray[B];
-
-   delete [] dparray;
-
-/*
    Newton newton;
 
    //hamiltoniaan
@@ -110,7 +65,7 @@ int main(void) {
    int tot_iter = 0;
 
    //outer iteration: scaling of the potential barrier
-   //while(t > 1.0e-12){
+   while(t > 1.0e-12){
 
       cout << t << "\t" << rdm.trace() << "\t" << rdm.ddot(ham) << "\t";
 
@@ -120,7 +75,7 @@ int main(void) {
 
       //inner iteration: 
       //Newton's method for finding the minimum of the current potential
-      //while(convergence > tolerance){
+      while(convergence > tolerance){
 
          ++nr_newton_iter;
 
@@ -145,7 +100,7 @@ int main(void) {
 
          convergence = a*a*delta.ddot(delta);
 
-     // }
+      }
 
       cout << nr_newton_iter << endl;
 
@@ -171,7 +126,7 @@ int main(void) {
 
       tot_iter += nr_newton_iter;
 
-//   }
+   }
 
    cout << endl;
 
@@ -181,7 +136,7 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-*/
+
    Gradient::clear();
 
    TPTPM::clear();
