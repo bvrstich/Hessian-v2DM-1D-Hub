@@ -251,4 +251,55 @@ void SPSPM::dpt4(double scale,double **dparray){
  */
 void SPSPM::dpw4(double scale,double **ppharray){
 
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   *this = 0.0;
+
+   //first S = 1/2
+   for(int S_kl = 0;S_kl < 2;++S_kl){
+
+      for(int k = 0;k < L;++k)
+         for(int l = k + S_kl;l < L;++l)
+            for(int a = 0;a < L;++a){
+
+               int K_pph = (k + l + a)%L;
+
+               for(int S_mn = 0;S_mn < 2;++S_mn){
+
+                  for(int m = 0;m < L;++m)
+                     for(int n = m + S_mn;n < L;++n){
+
+                        int e = (K_pph - m - n + 2*L)%L;
+
+                        (*this)(a,e) += 2.0 * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4] * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4];
+
+                     }
+
+               }
+
+            }
+
+   }
+
+   //then S = 3/2
+   for(int k = 0;k < L;++k)
+      for(int l = k + 1;l < L;++l)
+         for(int a = 0;a < L;++a){
+
+            int K_pph = (k + l + a)%L;
+
+            for(int m = 0;m < L;++m)
+               for(int n = m + 1;n < L;++n){
+
+                  int e = (K_pph - m - n + 2*L)%L;
+
+                  (*this)(a,e) += 4.0 * ppharray[K_pph + L][k + l*L + m*L2 + n*L3] * ppharray[K_pph + L][k + l*L + m*L2 + n*L3];
+
+               }
+
+         }
+
 }

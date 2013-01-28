@@ -80,6 +80,11 @@ int main(void) {
 
    cout << "dptw2'ed" << endl;
 
+   SPSPM spmm;
+   spmm.dpw4(1.0,ppharray);
+   
+   cout << "dpw4'ed" << endl;
+
    //remove the array
    for(int B = 0;B < 2*L;++B)
       delete [] ppharray[B];
