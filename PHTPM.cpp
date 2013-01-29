@@ -52,7 +52,7 @@ void PHTPM::dptw(double **ppharray){
 
    int sign;
 
-   for(int i = 0;i < gn();++i){
+   for(int i = 0;i < gm();++i){
 
       B = PHPHM::gphmm2ph(i,0);
 
@@ -66,7 +66,7 @@ void PHTPM::dptw(double **ppharray){
       c = PHM::gph2s(B_,J_i,0);
       d = PHM::gph2s(B_,J_i,1);
 
-      for(int j = 0;j < gm();++j){
+      for(int j = 0;j < gn();++j){
 
          B_ = TPTPM::gtpmm2t(j,0);
 
@@ -80,14 +80,21 @@ void PHTPM::dptw(double **ppharray){
          t = TPM::gt2s(B_,L_i,0);
          h = TPM::gt2s(B_,L_i,1);
 
-         double ward = 0.0;
+         (*this)(i,j) = 0.0;
 
-         //first S'' = 1/2
          for(int k = 0;k < L;++k){
 
             int K_pph = (k + a + b)%L;
 
-            ward += ppharray[K_pph][k + a*L + e*L2 + z*L3 + S*L4 + 2*S_*L4]
+            //first S'' = 1/2
+            (*this)(i,j) += 2.0 * (ppharray[K_pph][k + a*L + e*L2 + z*L3 + S*L4 + 2*S_*L4] * ppharray[K_pph][k + d*L + t*L2 + h*L3 + S*L4 + 2*S_*L4]
+
+               + ppharray[K_pph][k + a*L + t*L2 + h*L3 + S*L4 + 2*S_*L4] * ppharray[K_pph][k + d*L + e*L2 + z*L3 + S*L4 + 2*S_*L4] );
+
+            //first S'' = 3/2
+            (*this)(i,j) += 4.0 * (ppharray[K_pph + L][k + a*L + e*L2 + z*L3] * ppharray[K_pph + L][k + d*L + t*L2 + h*L3]
+
+                  + ppharray[K_pph + L][k + a*L + t*L2 + h*L3] * ppharray[K_pph + L][k + d*L + e*L2 + z*L3] );
 
          }
 

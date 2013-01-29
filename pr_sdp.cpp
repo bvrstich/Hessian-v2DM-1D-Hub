@@ -91,7 +91,7 @@ int main(void) {
 
    cout << "convert_st'ed" << endl;
 
-   TPTPM dptw;
+   PHTPM dptw;
    dptw.dptw(ppharray);
    
    cout << "dptw'ed" << endl;
