@@ -49,8 +49,6 @@ int main(void) {
 
    Gradient::init();
 
-   Newton newton;
-
    PPHM pphm;
    pphm.fill_Random();
 
@@ -85,13 +83,23 @@ int main(void) {
    
    cout << "dpw4'ed" << endl;
 
+   PPHM::convert_st(ppharray);
+
+   cout << "convert_st'ed" << endl;
+
+   TPTPM dptw;
+   dptw.dptw(ppharray);
+   
+   cout << "dptw'ed" << endl;
+/*
+   Newton newton;
+   
    //remove the array
    for(int B = 0;B < 2*L;++B)
       delete [] ppharray[B];
 
    delete [] ppharray;
 
-   /*
    //hamiltoniaan
    TPM ham;
    ham.hubbard(1.0);

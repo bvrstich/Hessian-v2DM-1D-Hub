@@ -578,7 +578,7 @@ void TPTPM::dpt2(double **dparray){
  */
 void TPTPM::dpt2_pph(double **ppharray){
 
-    int L = Tools::gL();
+   int L = Tools::gL();
    int L2 = L*L;
    int L3 = L2*L;
    int L4 = L3*L;
@@ -663,6 +663,138 @@ void TPTPM::dpt2_pph(double **ppharray){
  * construct a TPTPM by once tracing and once skew-tracing the direct product of two PPHM matrices, already translated to 'array' for for faster access
  */
 void TPTPM::dptw(double **ppharray){
+
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   int B,B_;
+
+   int a,b,c,d;
+   int e,z,t,h;
+
+   int a_,b_;
+
+   int I_i,J_i,K_i,L_i;
+
+   int S,S_;
+
+   int sign;
+
+   for(int i = 0;i < gn();++i){
+
+      B = tpmm2t[i][0];
+
+      S = TPM::gblock_char(B,0);
+
+      sign = 1 - 2*S;
+
+      I_i = tpmm2t[i][1];
+      J_i = tpmm2t[i][2];
+
+      a = TPM::gt2s(B,I_i,0);
+      b = TPM::gt2s(B,I_i,1);
+      c = TPM::gt2s(B,J_i,0);
+      d = TPM::gt2s(B,J_i,1);
+
+      a_ = Tools::par(a);
+      b_ = Tools::par(b);
+
+      for(int j = i;j < gn();++j){
+
+         B_ = tpmm2t[j][0];
+
+         S_ = TPM::gblock_char(B_,0);
+
+         K_i = tpmm2t[j][1];
+         L_i = tpmm2t[j][2];
+
+         e = TPM::gt2s(B_,K_i,0);
+         z = TPM::gt2s(B_,K_i,1);
+         t = TPM::gt2s(B_,L_i,0);
+         h = TPM::gt2s(B_,L_i,1);
+
+         (*this)(i,j) = 0.0;
+
+         //S'' = 1/2 first
+         double ward = 0.0;
+
+         for(int J = 0;J < 2;++J){
+
+            for(int k = 0;k < L;++k){
+
+               int K_pph = (k + d + a_)%L;
+
+               ward += ppharray[K_pph][k + d*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + b*L + t*L2 + h*L3 + J*L4 + 2*S_*L4]
+
+                  + ppharray[K_pph][k + d*L + t*L2 + h*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + b*L + e*L2 + z*L3 + J*L4 + 2*S_*L4];
+
+               K_pph = (k + d + b_)%L;
+
+               ward += sign * ( ppharray[K_pph][k + d*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + a*L + t*L2 + h*L3 + J*L4 + 2*S_*L4]
+
+                  + ppharray[K_pph][k + d*L + t*L2 + h*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + a*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] );
+
+               K_pph = (k + c + a_)%L;
+
+               ward += sign * ( ppharray[K_pph][k + c*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + b*L + t*L2 + h*L3 + J*L4 + 2*S_*L4]
+
+                  + ppharray[K_pph][k + c*L + t*L2 + h*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + b*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] );
+
+               K_pph = (k + c + b_)%L;
+
+               ward += ppharray[K_pph][k + c*L + e*L2 + z*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + a*L + t*L2 + h*L3 + J*L4 + 2*S_*L4]
+
+                  + ppharray[K_pph][k + c*L + t*L2 + h*L3 + J*L4 + 2*S_*L4] * ppharray[K_pph][k + a*L + e*L2 + z*L3 + J*L4 + 2*S_*L4];
+
+            }
+
+            (*this)(i,j) += ward * (2*J + 1.0) * Tools::g6j(0,0,S,J);
+
+         }
+
+         (*this)(i,j) *= 2.0 / (2*S_ + 1.0);
+
+         //then S'' = 3/2, only
+         if(S_ == 1){
+
+            ward = 0.0;
+
+            for(int k = 0;k < L;++k){
+
+               int K_pph = (k + d + a_)%L;
+
+               ward += ppharray[K_pph + L][k + d*L + e*L2 + z*L3] * ppharray[K_pph + L][k + b*L + t*L2 + h*L3]
+
+                  + ppharray[K_pph + L][k + d*L + t*L2 + h*L3] * ppharray[K_pph + L][k + b*L + e*L2 + z*L3];
+
+               K_pph = (k + d + b_)%L;
+
+               ward -= ppharray[K_pph + L][k + d*L + e*L2 + z*L3] * ppharray[K_pph + L][k + a*L + t*L2 + h*L3]
+
+                  + ppharray[K_pph + L][k + d*L + t*L2 + h*L3] * ppharray[K_pph + L][k + a*L + e*L2 + z*L3];
+
+               K_pph = (k + c + a_)%L;
+
+               ward -= ppharray[K_pph + L][k + c*L + e*L2 + z*L3] * ppharray[K_pph + L][k + b*L + t*L2 + h*L3]
+
+                  + ppharray[K_pph + L][k + c*L + t*L2 + h*L3] * ppharray[K_pph + L][k + b*L + e*L2 + z*L3];
+
+               K_pph = (k + c + b_)%L;
+
+               ward += ppharray[K_pph + L][k + c*L + e*L2 + z*L3] * ppharray[K_pph + L][k + a*L + t*L2 + h*L3]
+
+                  + ppharray[K_pph + L][k + c*L + t*L2 + h*L3] * ppharray[K_pph + L][k + a*L + e*L2 + z*L3];
+
+            }
+
+            (*this)(i,j) +=  4.0 * ward * Tools::g6j(0,0,S,1);
+
+         }
+
+      }
+   }
 
 }
 
