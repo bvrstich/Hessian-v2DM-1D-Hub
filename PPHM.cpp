@@ -721,6 +721,7 @@ void PPHM::convert(double **array) const {
 
    }//end of S=1/2 block loop
 
+   //S = 3/2 is easier
    for(int B = L;B < 2*L;++B){
 
       int K = block_char[B][1];
@@ -735,12 +736,12 @@ void PPHM::convert(double **array) const {
                for(int e = d + 1;e < L;++e){
 
                   z = (K - d - e + 2*L)%L;
-                  j = s2pph[K][0][d][e][z];
+                  j = s2pph[B][0][d][e][z];
 
-                  array[K][a + b*L + d*L2 + e*L3] = (*this)(K,i,j);
-                  array[K][b + a*L + d*L2 + e*L3] =  -array[K][a + b*L + d*L2 + e*L3];
-                  array[K][a + b*L + e*L2 + d*L3] =  -array[K][a + b*L + d*L2 + e*L3];
-                  array[K][b + a*L + e*L2 + d*L3] =  array[K][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + d*L2 + e*L3] = (*this)(K,i,j);
+                  array[B][b + a*L + d*L2 + e*L3] =  -array[K][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + e*L2 + d*L3] =  -array[K][a + b*L + d*L2 + e*L3];
+                  array[B][b + a*L + e*L2 + d*L3] =  array[K][a + b*L + d*L2 + e*L3];
 
                }
 
