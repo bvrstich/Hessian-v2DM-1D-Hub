@@ -24,6 +24,8 @@ CPPSRC	= pr_sdp.cpp\
             TPTPM.cpp\
             SPSPM.cpp\
             TPSPM.cpp\
+            PHPHM.cpp\
+            PHTPM.cpp\
             Hessian.cpp\
             Gradient.cpp\
             Newton.cpp

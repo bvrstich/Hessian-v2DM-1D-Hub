@@ -54,8 +54,10 @@
 #include "Hessian.h"
 #include "Gradient.h"
 
+#include "PHPHM.h"
 #include "SPSPM.h"
 #include "TPSPM.h"
+#include "PHTPM.h"
 
 #include "SUP.h"
 #include "EIG.h"

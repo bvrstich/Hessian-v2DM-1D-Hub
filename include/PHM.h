@@ -60,6 +60,8 @@ class PHM : public BlockMatrix {
 
       static void clear();
 
+      static int gdim(int);
+
       static int gph2s(int,int,int);
 
       static int gs2ph(int,int,int);

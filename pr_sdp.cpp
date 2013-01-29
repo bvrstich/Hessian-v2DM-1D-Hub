@@ -46,8 +46,12 @@ int main(void) {
    PPHM::init();
 
    TPTPM::init();
+   PHPHM::init();
 
    Gradient::init();
+
+   PHTPM phtpm;
+   phtpm.fill_Random();
 
    PPHM pphm;
    pphm.fill_Random();
@@ -67,7 +71,7 @@ int main(void) {
    pphm.convert(ppharray);
 
    cout << "converted" << endl;
-
+/*
    TPTPM tpmm;
    tpmm.dpt2_pph(ppharray);
 
@@ -82,7 +86,7 @@ int main(void) {
    spmm.dpw4(1.0,ppharray);
    
    cout << "dpw4'ed" << endl;
-
+*/
    PPHM::convert_st(ppharray);
 
    cout << "convert_st'ed" << endl;
@@ -91,6 +95,7 @@ int main(void) {
    dptw.dptw(ppharray);
    
    cout << "dptw'ed" << endl;
+
 /*
    Newton newton;
    
@@ -187,8 +192,10 @@ int main(void) {
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
    */
-      Gradient::clear();
 
+   Gradient::clear();
+
+   PHPHM::clear();
    TPTPM::clear();
 
    PPHM::clear();

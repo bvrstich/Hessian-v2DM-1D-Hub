@@ -334,4 +334,40 @@ void PHM::bar(double scale,const PPHM &pphm){
 
 }
 
+/**
+ * @return the dimension of the block corresponding to index B
+ */
+int PHM::gdim(int B) {
+
+   return ph2s[B].size();
+
+}
+
+/**
+ * access to the lists from outside of the class
+ */
+int PHM::gph2s(int B,int i,int option){
+
+   return ph2s[B][i][option];
+
+}
+
+/**
+ * access to the lists from outside of the class
+ */
+int PHM::gs2ph(int B,int a,int b){
+
+   return s2ph[B][a][b];
+
+}
+
+/**
+ * access to the lists from outside of the class
+ */
+int PHM::gblock_char(int block,int option){
+
+   return block_char[block][option];
+
+}
+
 /* vim: set ts=3 sw=3 expandtab :*/
