@@ -361,7 +361,7 @@ void TPSPM::dpw3(double scale,double **ppharray){
    int L3 = L2*L;
    int L4 = L3*L;
 
-   int B,I,J;
+   int B,I_i,J_i;
 
    int S;
 
@@ -376,17 +376,17 @@ void TPSPM::dpw3(double scale,double **ppharray){
 
       B = TPTPM::gtpmm2t(i,0);
 
-      I = TPTPM::gtpmm2t(i,1);
-      J = TPTPM::gtpmm2t(i,2);
+      I_i = TPTPM::gtpmm2t(i,1);
+      J_i = TPTPM::gtpmm2t(i,2);
 
       S = TPM::gblock_char(B,0);
 
       sign = 1 - 2*S;
 
-      a = TPM::gt2s(B,I,0);
-      b = TPM::gt2s(B,I,1);
-      c = TPM::gt2s(B,J,0);
-      d = TPM::gt2s(B,J,1);
+      a = TPM::gt2s(B,I_i,0);
+      b = TPM::gt2s(B,I_i,1);
+      c = TPM::gt2s(B,J_i,0);
+      d = TPM::gt2s(B,J_i,1);
 
       for(int e = 0;e < L;++e){
 
