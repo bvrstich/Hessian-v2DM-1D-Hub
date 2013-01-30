@@ -406,22 +406,22 @@ void TPSPM::dpw3(double scale,double **ppharray){
                      //1)
                      k = (K_pph - d + a + L)%L;
 
-                     ward += ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
+                     ward += ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
 
                      //2)
                      k = (K_pph - d + b + L)%L;
 
-                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
+                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
 
                      //3)
                      k = (K_pph - c + a + L)%L;
 
-                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
+                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
 
                      //4)
                      k = (K_pph - c + b + L)%L;
 
-                     ward += ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
+                     ward += ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
 
                   }
 

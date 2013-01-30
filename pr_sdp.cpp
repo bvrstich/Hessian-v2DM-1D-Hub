@@ -35,8 +35,8 @@ int main(void) {
 
    cout.precision(10);
 
-   const int L = 20;//dim sp hilbert space
-   const int N = 20;//nr of particles
+   const int L = 6;//dim sp hilbert space
+   const int N = 6;//nr of particles
 
    Tools::init(L,N);
 
@@ -49,71 +49,7 @@ int main(void) {
 
    Gradient::init();
 
-   PPHM pphm;
-   pphm.fill_Random();
-
-   int L2 = L*L;
-   int L3 = L2*L;
-   int L4 = L3*L;
-
-   double **ppharray = new double * [2*L];
-
-   for(int B = 0;B < L;++B)//S = 1/2
-      ppharray[B] = new double [4*L4];
-
-   for(int B = L;B < 2*L;++B)//S = 3/2
-      ppharray[B] = new double [L4];
-
-   pphm.convert(ppharray);
-
-   cout << "converted" << endl;
-
-   TPTPM tpmm;
-   tpmm.dpt2_pph(ppharray);
-
-   cout << "dpt2'ed" << endl;
-
-   TPSPM tpspm;
-   tpspm.dptw2(1.0,ppharray);
-
-   cout << "dptw2'ed" << endl;
-
-   SPSPM spmm;
-   spmm.dpw4(1.0,ppharray);
-   
-   cout << "dpw4'ed" << endl;
-
-   PPHM::convert_st(ppharray);
-
-   cout << "convert_st'ed" << endl;
-
-   TPTPM dptw;
-   dptw.dptw(ppharray);
-   
-   cout << "dptw'ed" << endl;
-
-   TPSPM dpw3;
-   dpw3.dpw3(1.0,ppharray);
-
-   cout << "dpw3'ed" << endl;
-
-   PPHM::convert_st(ppharray);
-
-   cout << "convert_st2'ed" << endl;
-
-   TPTPM dpw2;
-   dpw2.dpw2(ppharray);
-
-   cout << "dpw2'ed" << endl;
-
-/*
    Newton newton;
-   
-   //remove the array
-   for(int B = 0;B < 2*L;++B)
-      delete [] ppharray[B];
-
-   delete [] ppharray;
 
    //hamiltoniaan
    TPM ham;
@@ -201,8 +137,8 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-   */
-      Gradient::clear();
+
+   Gradient::clear();
 
    TPTPM::clear();
 

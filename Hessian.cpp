@@ -463,6 +463,64 @@ void Hessian::T(const PPHM &T){
 
    SPSPM dpw4;
    dpw4.dpw4(1.0/( (Tools::gN() - 1.0)*(Tools::gN() - 1.0)),ppharray);
+   int B,I_i,J_i,B_,K_i,L_i;
+
+   //first store everything in ward, then multiply with norms and add to (*this)!
+   double ward;
+
+   int a,b,c,d;
+   int e,z,t,h;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      I_i = TPTPM::gtpmm2t(i,1);
+      J_i = TPTPM::gtpmm2t(i,2);
+
+      a = TPM::gt2s(B,I_i,0);
+      b = TPM::gt2s(B,I_i,1);
+      c = TPM::gt2s(B,J_i,0);
+      d = TPM::gt2s(B,J_i,1);
+
+      for(int j = i;j < TPTPM::gn();++j){
+
+         B_ = TPTPM::gtpmm2t(j,0);
+
+         K_i = TPTPM::gtpmm2t(j,1);
+         L_i = TPTPM::gtpmm2t(j,2);
+
+         e = TPM::gt2s(B_,K_i,0);
+         z = TPM::gt2s(B_,K_i,1);
+         t = TPM::gt2s(B_,L_i,0);
+         h = TPM::gt2s(B_,L_i,1);
+
+         //first the TPTPM parts
+         ward = 2.0 * dpt2(i,j) - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
+        
+         ward += 2.0 * TPM::gnorm(a,b) * TPM::gnorm(c,d) * TPM::gnorm(e,z) * TPM::gnorm(t,h) * dpw2(i,j);
+
+         if(I_i == J_i){
+
+            if(K_i == L_i)
+               ward += dpw4(a,e) + dpw4(a,z) + dpw4(b,e) + dpw4(b,z);
+
+            ward += dptw2(j,a) + dptw2(j,b);
+
+            ward -= dpw3(j,a) + dpw3(j,b);
+
+         }
+
+         if(K_i == L_i){
+
+            ward += dptw2(i,e) + dptw2(i,z);
+
+            ward -= dpw3(i,e) + dpw3(i,z);
+
+         }
+
+      }
+   }
 
    //remove the array
    for(int B = 0;B < 2*L;++B)
