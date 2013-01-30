@@ -682,6 +682,8 @@ void TPTPM::dptw(double **ppharray){
 
    int sign;
 
+   double ward;
+
    for(int i = 0;i < gn();++i){
 
       B = tpmm2t[i][0];
@@ -701,7 +703,7 @@ void TPTPM::dptw(double **ppharray){
       a_ = Tools::par(a);
       b_ = Tools::par(b);
 
-      for(int j = i;j < gn();++j){
+      for(int j = 0;j < gn();++j){
 
          B_ = tpmm2t[j][0];
 
@@ -718,9 +720,9 @@ void TPTPM::dptw(double **ppharray){
          (*this)(i,j) = 0.0;
 
          //S'' = 1/2 first
-         double ward = 0.0;
-
          for(int J = 0;J < 2;++J){
+
+            ward = 0.0;
 
             for(int k = 0;k < L;++k){
 

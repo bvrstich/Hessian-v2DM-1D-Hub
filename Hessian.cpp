@@ -496,6 +496,9 @@ void Hessian::T(const PPHM &T){
    int a,b,c,d;
    int e,z,t,h;
 
+   int a_,b_;
+   int e_,z_;
+
    for(int i = 0;i < TPTPM::gn();++i){
 
       B = TPTPM::gtpmm2t(i,0);
@@ -509,6 +512,9 @@ void Hessian::T(const PPHM &T){
       b = TPM::gt2s(B,I_i,1);
       c = TPM::gt2s(B,J_i,0);
       d = TPM::gt2s(B,J_i,1);
+
+      a_ = Tools::par(a);
+      b_ = Tools::par(b);
 
       for(int j = i;j < TPTPM::gn();++j){
 
@@ -524,17 +530,20 @@ void Hessian::T(const PPHM &T){
          t = TPM::gt2s(B_,L_i,0);
          h = TPM::gt2s(B_,L_i,1);
 
+         e_ = Tools::par(e);
+         z_ = Tools::par(z);
+
          //first the TPTPM parts
-         ward = 2.0 * dpt2(i,j);// - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
-       /* 
+         ward =/* 2.0 * dpt2(i,j)*/ - 2.0 * (/* dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d)*/ + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
+/*       
          ward += 2.0 * TPM::gnorm(a,b) * TPM::gnorm(c,d) * TPM::gnorm(e,z) * TPM::gnorm(t,h) * dpw2(i,j);
 
          if(I_i == J_i){
 
             if(K_i == L_i)
-               ward += dpw4(a,e) + dpw4(a,z) + dpw4(b,e) + dpw4(b,z);
+               ward += dpw4(a_,e_) + dpw4(a_,z_) + dpw4(b_,e_) + dpw4(b_,z_);
 
-            ward += dptw2(j,a) + dptw2(j,b);
+            ward += dptw2(j,a_) + dptw2(j,b_);
 
             ward -= dpw3(j,a) + dpw3(j,b);
 
@@ -542,9 +551,9 @@ void Hessian::T(const PPHM &T){
 
          if(K_i == L_i){
 
-            ward += dptw2(i,e) + dptw2(i,z);
+            ward += dptw2(i,e_) + dptw2(i,z_);
 
-            ward -= dpw3(i,e) + dpw3(i,z);
+           ward -= dpw3(i,e) + dpw3(i,z);
 
          }
 */

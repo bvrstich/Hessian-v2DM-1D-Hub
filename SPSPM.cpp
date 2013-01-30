@@ -274,7 +274,7 @@ void SPSPM::dpw4(double scale,double **ppharray){
 
                         int e = (K_pph - m - n + 2*L)%L;
 
-                        (*this)(a,e) += 2.0 * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4] * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4];
+                        (*this)(a,e) += 2.0 * scale * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4] * ppharray[K_pph][k + l*L + m*L2 + n*L3 + S_kl*L4 + 2*S_mn*L4];
 
                      }
 
@@ -296,7 +296,7 @@ void SPSPM::dpw4(double scale,double **ppharray){
 
                   int e = (K_pph - m - n + 2*L)%L;
 
-                  (*this)(a,e) += 4.0 * ppharray[K_pph + L][k + l*L + m*L2 + n*L3] * ppharray[K_pph + L][k + l*L + m*L2 + n*L3];
+                  (*this)(a,e) += 4.0 * scale * ppharray[K_pph + L][k + l*L + m*L2 + n*L3] * ppharray[K_pph + L][k + l*L + m*L2 + n*L3];
 
                }
 

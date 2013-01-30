@@ -505,7 +505,7 @@ void TPSPM::dptw2(double scale,double **ppharray){
          //first S = 1/2
          for(int S_kl = 0;S_kl < 2;++S_kl)
             for(int k = 0;k < L;++k)
-               for(int l = k + S_kl;l < k;++l){
+               for(int l = k + S_kl;l < L;++l){
 
                   int K_pph = (k + l + e)%L;
 
@@ -520,7 +520,7 @@ void TPSPM::dptw2(double scale,double **ppharray){
             ward = 0.0;
 
             for(int k = 0;k < L;++k)
-               for(int l = k + 1;l < k;++l){
+               for(int l = k + 1;l < L;++l){
 
                   int K_pph = (k + l + e)%L;
 
@@ -529,7 +529,7 @@ void TPSPM::dptw2(double scale,double **ppharray){
 
                }
 
-            (*this)(i,e) += 4.0/9.0 * ward;
+            (*this)(i,e) += 4.0/3.0 * ward;
 
          }
 
