@@ -91,6 +91,21 @@ int main(void) {
    dptw.dptw(ppharray);
    
    cout << "dptw'ed" << endl;
+
+   TPSPM dpw3;
+   dpw3.dpw3(1.0,ppharray);
+
+   cout << "dpw3'ed" << endl;
+
+   PPHM::convert_st(ppharray);
+
+   cout << "convert_st2'ed" << endl;
+
+   TPTPM dpw2;
+   dpw2.dpw2(ppharray);
+
+   cout << "dpw2'ed" << endl;
+
 /*
    Newton newton;
    

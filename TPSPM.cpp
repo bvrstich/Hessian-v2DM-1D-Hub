@@ -356,6 +356,116 @@ void TPSPM::dpt3(double scale,double **dparray){
  */
 void TPSPM::dpw3(double scale,double **ppharray){
 
+   int L = Tools::gL();
+   int L2 = L*L;
+   int L3 = L2*L;
+   int L4 = L3*L;
+
+   int B,I,J;
+
+   int S;
+
+   int a,b,c,d;
+
+   double ward;
+   int k,K_pph;
+
+   int sign;
+
+   for(int i = 0;i < TPTPM::gn();++i){
+
+      B = TPTPM::gtpmm2t(i,0);
+
+      I = TPTPM::gtpmm2t(i,1);
+      J = TPTPM::gtpmm2t(i,2);
+
+      S = TPM::gblock_char(B,0);
+
+      sign = 1 - 2*S;
+
+      a = TPM::gt2s(B,I,0);
+      b = TPM::gt2s(B,I,1);
+      c = TPM::gt2s(B,J,0);
+      d = TPM::gt2s(B,J,1);
+
+      for(int e = 0;e < L;++e){
+
+         (*this)(i,e) = 0.0;
+
+         //S'' = 1/2
+         for(int J = 0;J < 2;++J){
+
+            ward = 0.0;
+
+            for(int S_mn = 0;S_mn < 2;++S_mn)
+               for(int m = 0;m < L;++m)
+                  for(int n = m + S_mn;n < L;++n){
+
+                     K_pph = (m + n - e + L)%L;
+
+                     //1)
+                     k = (K_pph - d + a + L)%L;
+
+                     ward += ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
+
+                     //2)
+                     k = (K_pph - d + b + L)%L;
+
+                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + d*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
+
+                     //3)
+                     k = (K_pph - c + a + L)%L;
+
+                     ward += sign * ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3 + S_mn*L4 + 2*J*L4];
+
+                     //4)
+                     k = (K_pph - c + b + L)%L;
+
+                     ward += ppharray[K_pph][m + n*L + k*L2 + c*L3 + S_mn*L4 + 2*J*L4] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3 + S_mn*L4 + 2*J*L4];
+
+                  }
+
+            (*this)(i,e) += 2.0 * (2.0*J + 1.0) * Tools::g6j(0,0,S,J) * ward;
+
+         }
+
+         ward = 0.0;
+
+         //S'' = 3/2
+         for(int m = 0;m < L;++m)
+            for(int n = m + 1;n < L;++n){
+
+               K_pph = (m + n - e + L)%L;
+
+               //1)
+               k = (K_pph - d + a + L)%L;
+
+               ward += ppharray[K_pph + L][m + n*L + k*L2 + d*L3] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3];
+
+               //2)
+               k = (K_pph - d + b + L)%L;
+
+               ward -= ppharray[K_pph + L][m + n*L + k*L2 + d*L3] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3];
+
+               //3)
+               k = (K_pph - c + a + L)%L;
+
+               ward -= ppharray[K_pph + L][m + n*L + k*L2 + c*L3] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3];
+
+               //4)
+               k = (K_pph - c + b + L)%L;
+
+               ward += ppharray[K_pph + L][m + n*L + k*L2 + c*L3] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3];
+
+            }
+
+         (*this)(i,e) += 4.0 * 3.0 * Tools::g6j(0,0,S,1) * ward;
+
+         (*this)(i,e) *= scale;
+
+      }
+   }
+
 }
 
 /**
@@ -401,7 +511,7 @@ void TPSPM::dptw2(double scale,double **ppharray){
 
                   ward += ppharray[K_pph][a + b*L + k*L2 + l*L3 + S*L4 + 2*S_kl*L4] * ppharray[K_pph][c + d*L + k*L2 + l*L3 + S*L4 + 2*S_kl*L4];
 
-            }
+               }
 
          (*this)(i,e) = 2.0/(2.0*S + 1.0) * ward;
 

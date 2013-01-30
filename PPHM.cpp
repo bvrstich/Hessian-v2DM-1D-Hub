@@ -819,4 +819,64 @@ void PPHM::convert_st(double **array) {
 
 }
 
+/**
+ * convert a PPHM matrix to a double array for faster access to the number, fast conversion
+ */
+void PPHM::convert_st2(double **array) {
+
+   int L = Tools::gL();
+   int L2 = L * L;
+   int L3 = L * L2;
+   int L4 = L * L3;
+
+   double ward_0,ward_1;
+
+   double SQ3 = std::sqrt(3.0);
+
+   //first S = 1/2
+   for(int K = 0;K < L;++K){
+
+      for(int J_ = 0;J_ < 2;++J_)
+         for(int d = 0;d < L;++d)
+            for(int e = 0;e < L;++e)
+               for(int a = 0;a < L;++a)
+                  for(int b = 0;b < L;++b){
+
+                     //first S_ab = 0
+
+                     //ward_0 for J = 0, ward_1 for J = 1
+                     ward_0 = Tools::g6j(0,0,0,0) / TPM::gnorm(a,b) * array[K][a + b*L + d*L2 + e*L3 + 2*J_*L4];
+                     ward_1 = Tools::g6j(0,0,0,1) / TPM::gnorm(a,b) * array[K][a + b*L + d*L2 + e*L3 + 2*J_*L4];
+
+                     //then S_ab = 1
+                     ward_0 += SQ3 * Tools::g6j(0,0,1,0) * array[K][a + b*L + d*L2 + e*L3 + L4 + 2*J_*L4];
+                     ward_1 += SQ3 * Tools::g6j(0,0,1,1) * array[K][a + b*L + d*L2 + e*L3 + L4 + 2*J_*L4];
+
+                     //now transform
+                     array[K][a + b*L + d*L2 + e*L3 + 2*J_*L4] = ward_0;//J = 0
+                     array[K][a + b*L + d*L2 + e*L3 + L4 + 2*J_*L4] = ward_1;//J = 1
+
+                  }
+
+   }//end of S = 1/2 block loop
+
+   //then S = 3/2
+   for(int B = L;B < 2*L;++B){
+
+      for(int a = 0;a < L;++a)
+         for(int b = a + 1;b < L;++b)
+            for(int d = 0;d < L;++d)
+               for(int e = d + 1;e < L;++e){
+
+                     array[B][a + b*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3] / SQ3;
+                     array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                     array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                     array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+
+               }
+
+   }
+
+}
+
 /* vim: set ts=3 sw=3 expandtab :*/

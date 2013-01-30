@@ -57,6 +57,8 @@ class PPHM : public BlockMatrix {
 
       static void convert_st(double **);
 
+      static void convert_st2(double **);
+
       static int gblock_char(int,int);
 
       static int gpph2s(int,int,int);
