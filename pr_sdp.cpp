@@ -49,6 +49,24 @@ int main(void) {
 
    Gradient::init();
 
+   PPHM pphm;
+   pphm.fill_Random();
+
+   ofstream out("../do_1D_hub/pphm.in");
+   out.precision(15);
+
+   for(int B = 0;B < pphm.gnr();++B)
+      for(int i = 0;i < pphm.gdim(B);++i)
+         for(int j = i;j < pphm.gdim(B);++j)
+            out << B << "\t" << i << "\t" << j << "\t" << pphm(B,i,j) << endl;
+
+   Hessian H;
+   H = 0.0;
+
+   H.T(pphm);
+
+   cout << H;
+/*
    Newton newton;
 
    //hamiltoniaan
@@ -137,7 +155,7 @@ int main(void) {
 
    cout << endl;
    cout << "Total nr of Newton steps = " << tot_iter << endl;
-
+*/
    Gradient::clear();
 
    TPTPM::clear();

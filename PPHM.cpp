@@ -738,10 +738,10 @@ void PPHM::convert(double **array) const {
                   z = (K - d - e + 2*L)%L;
                   j = s2pph[B][0][d][e][z];
 
-                  array[B][a + b*L + d*L2 + e*L3] = (*this)(K,i,j);
-                  array[B][b + a*L + d*L2 + e*L3] =  -array[K][a + b*L + d*L2 + e*L3];
-                  array[B][a + b*L + e*L2 + d*L3] =  -array[K][a + b*L + d*L2 + e*L3];
-                  array[B][b + a*L + e*L2 + d*L3] =  array[K][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + d*L2 + e*L3] = (*this)(B,i,j);
+                  array[B][b + a*L + d*L2 + e*L3] =  -array[B][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + e*L2 + d*L3] =  -array[B][a + b*L + d*L2 + e*L3];
+                  array[B][b + a*L + e*L2 + d*L3] =  array[B][a + b*L + d*L2 + e*L3];
 
                }
 

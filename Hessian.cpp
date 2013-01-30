@@ -446,24 +446,49 @@ void Hessian::T(const PPHM &T){
 
    T.convert(ppharray);
 
-   TPTPM dpw2;
-   dpw2.dpw2(ppharray);
-
-   TPTPM dptw;
-   dptw.dptw(ppharray);
+   cout << "converted" << endl;
 
    TPTPM dpt2;
    dpt2.dpt2_pph(ppharray);
 
-   TPSPM dpw3;
-   dpw3.dpw3(2.0/(Tools::gN() - 1.0),ppharray);
+   cout << "dpt2'ed" << endl;
 
    TPSPM dptw2;
    dptw2.dptw2(2.0/(Tools::gN() - 1.0),ppharray);
 
+   cout << "dptw2'ed" << endl;
+
    SPSPM dpw4;
    dpw4.dpw4(1.0/( (Tools::gN() - 1.0)*(Tools::gN() - 1.0)),ppharray);
+   
+   cout << "dpw4'ed" << endl;
+
+   PPHM::convert_st(ppharray);
+
+   cout << "convert_st'ed" << endl;
+
+   TPTPM dptw;
+   dptw.dptw(ppharray);
+   
+   cout << "dptw'ed" << endl;
+
+   TPSPM dpw3;
+   dpw3.dpw3(2.0/(Tools::gN() - 1.0),ppharray);
+
+   cout << "dpw3'ed" << endl;
+
+   PPHM::convert_st(ppharray);
+
+   cout << "convert_st2'ed" << endl;
+
+   TPTPM dpw2;
+   dpw2.dpw2(ppharray);
+
+   cout << "dpw2'ed" << endl;
+
    int B,I_i,J_i,B_,K_i,L_i;
+
+   int S,S_;
 
    //first store everything in ward, then multiply with norms and add to (*this)!
    double ward;
@@ -474,6 +499,8 @@ void Hessian::T(const PPHM &T){
    for(int i = 0;i < TPTPM::gn();++i){
 
       B = TPTPM::gtpmm2t(i,0);
+
+      S = TPM::gblock_char(B,0);
 
       I_i = TPTPM::gtpmm2t(i,1);
       J_i = TPTPM::gtpmm2t(i,2);
@@ -487,6 +514,8 @@ void Hessian::T(const PPHM &T){
 
          B_ = TPTPM::gtpmm2t(j,0);
 
+         S_ = TPM::gblock_char(B_,0);
+
          K_i = TPTPM::gtpmm2t(j,1);
          L_i = TPTPM::gtpmm2t(j,2);
 
@@ -496,8 +525,8 @@ void Hessian::T(const PPHM &T){
          h = TPM::gt2s(B_,L_i,1);
 
          //first the TPTPM parts
-         ward = 2.0 * dpt2(i,j) - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
-        
+         ward = 2.0 * dpt2(i,j);// - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
+       /* 
          ward += 2.0 * TPM::gnorm(a,b) * TPM::gnorm(c,d) * TPM::gnorm(e,z) * TPM::gnorm(t,h) * dpw2(i,j);
 
          if(I_i == J_i){
@@ -518,6 +547,9 @@ void Hessian::T(const PPHM &T){
             ward -= dpw3(i,e) + dpw3(i,z);
 
          }
+*/
+         //the norms
+         (*this)(i,j) += ward * Gradient::gnorm(i) * Gradient::gnorm(j) * (2.0*S + 1.0) * (2.0*S_ + 1.0);
 
       }
    }
