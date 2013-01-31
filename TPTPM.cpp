@@ -1019,16 +1019,16 @@ void TPTPM::dpw2(double **ppharray){
             //2) da;bc hz;et
             m = (K_pph - h + z + L)%L;
 
-            ward -= ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
+            ward += sign_ * ( ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3] );
 
             //3) da;bc te;zh
             m = (K_pph - t + e + L)%L;
 
-            ward -= ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
+            ward += sign_ * ( ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3] );
 
             //4) da;bc tz;eh
             m = (K_pph - t + z + L)%L;
@@ -1042,60 +1042,60 @@ void TPTPM::dpw2(double **ppharray){
             //5) db;ac he;zt
             m = (K_pph - h + e + L)%L;
 
-            ward -= ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
+            ward += sign * ( ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3] );
 
             //6) db;ac hz;et
             m = (K_pph - h + z + L)%L;
 
-            ward += ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
+            ward += sign * sign_ * ( ppharray[K_pph + L][k + d*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3] );
 
             //7) db;ac te;zh
             m = (K_pph - t + e + L)%L;
 
-            ward += ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
+            ward += sign * sign_ * ( ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3] );
 
             //8) db;ac tz;eh
             m = (K_pph - t + z + L)%L;
 
-            ward -= ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
+            ward += sign * ( ppharray[K_pph + L][k + d*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + d*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3] );
 
             K_pph = (k + c + a_)%L;
 
             //9) ca;bd he;zt
             m = (K_pph - h + e + L)%L;
 
-            ward -= ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
+            ward += sign * ( ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3] );
 
             //10) ca;bd hz;et
             m = (K_pph - h + z + L)%L;
 
-            ward += ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
+            ward += sign * sign_ * ( ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + h*L3] );
 
             //11) ca;bd te;zh
             m = (K_pph - t + e + L)%L;
 
-            ward += ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
+            ward += sign * sign_ * ( ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3] );
 
             //12) ca;bd tz;eh
             m = (K_pph - t + z + L)%L;
 
-            ward -= ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
+            ward += sign * ( ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + b*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + b*L + m*L2 + t*L3] );
 
             K_pph = (k + c + b_)%L;
 
@@ -1109,16 +1109,16 @@ void TPTPM::dpw2(double **ppharray){
             //14) cb;ad hz;et
             m = (K_pph - h + z + L)%L;
 
-            ward -= ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
+            ward += sign_ * ( ppharray[K_pph + L][k + c*L + m*L2 + h*L3] * ppharray[K_pph + L][k + a*L + m*L2 + e*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + e*L3] * ppharray[K_pph + L][k + a*L + m*L2 + h*L3] );
 
             //15) cb;ad te;zh
             m = (K_pph - t + e + L)%L;
 
-            ward -= ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
+            ward += sign_ * ( ppharray[K_pph + L][k + c*L + m*L2 + t*L3] * ppharray[K_pph + L][k + a*L + m*L2 + z*L3]
 
-               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3];
+               + ppharray[K_pph + L][k + c*L + m*L2 + z*L3] * ppharray[K_pph + L][k + a*L + m*L2 + t*L3] );
 
             //16) cb;ad tz;eh
             m = (K_pph - t + z + L)%L;
