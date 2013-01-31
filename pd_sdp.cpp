@@ -85,7 +85,7 @@ int main(void) {
 
    int iter = 0;
 
-   while(flag != 3){
+   //while(flag != 3){
 
       cout << (Z.gI()).trace() << "\t" << pd_gap << "\t" << center_dev << "\t" << energy << endl;
 
@@ -116,6 +116,7 @@ int main(void) {
       newton.set_rhs(b);
 
       newton.construct(D_inv);
+
       ++iter;
 
       //dit wordt de stap:
@@ -196,7 +197,7 @@ int main(void) {
 
       }
 
-   }
+//   }
 
    cout << endl;
    cout << "FINAL RESULT " << endl;
