@@ -683,6 +683,22 @@ void PPHM::convert(double **array) const {
 
    int sign_ab,sign_de;
 
+   //set elements with a == b and S_ab == 1 to zero
+   for(int K = 0;K < L;++K)
+      for(int a = 0;a < L;++a)
+         for(int S_de = 0;S_de < 2;++S_de)
+            for(int d = 0;d < L;++d)
+               for(int e = 0;e < L;++e)
+                  array[K][a + a*L + d*L2 + e*L3 + L4 + 2*S_de*L4] = 0.0;
+
+   //set elements with d == e and S_de == 1 to zero
+   for(int K = 0;K < L;++K)
+      for(int d = 0;d < L;++d)
+         for(int S_ab = 0;S_ab < 2;++S_ab)
+            for(int a = 0;a < L;++a)
+               for(int b = 0;b < L;++b)
+                  array[K][a + b*L + d*L2 + d*L3 + S_ab*L4 + 2*L4] = 0.0;
+
    //first S = 1/2
    for(int K = 0;K < L;++K){
 
@@ -720,6 +736,20 @@ void PPHM::convert(double **array) const {
       }
 
    }//end of S=1/2 block loop
+
+   //set elements with a == b equal to zero
+   for(int K = 0;K < L;++K)
+      for(int a = 0;a < L;++a)
+         for(int d = 0;d < L;++d)
+            for(int e = 0;e < L;++e)
+               array[K + L][a + a*L + d*L2 + e*L3] = 0.0;
+
+   //set elements with d == e and S_de == 1 to zero
+   for(int K = 0;K < L;++K)
+      for(int d = 0;d < L;++d)
+         for(int a = 0;a < L;++a)
+            for(int b = 0;b < L;++b)
+               array[K + L][a + b*L + d*L2 + d*L3] = 0.0;
 
    //S = 3/2 is easier
    for(int B = L;B < 2*L;++B){
@@ -808,10 +838,10 @@ void PPHM::convert_st(double **array) {
             for(int d = 0;d < L;++d)
                for(int e = d + 1;e < L;++e){
 
-                     array[B][a + b*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3] / SQ3;
-                     array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
-                     array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
-                     array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3] / SQ3;
+                  array[B][b + a*L + d*L2 + e*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                  array[B][a + b*L + e*L2 + d*L3] = -array[B][a + b*L + d*L2 + e*L3];
+                  array[B][b + a*L + e*L2 + d*L3] = array[B][a + b*L + d*L2 + e*L3];
 
                }
 

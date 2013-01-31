@@ -445,12 +445,12 @@ void TPSPM::dpw3(double scale,double **ppharray){
                //2)
                k = (K_pph - d + b + L)%L;
 
-               ward -= ppharray[K_pph + L][m + n*L + k*L2 + d*L3] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3];
+               ward += sign * ppharray[K_pph + L][m + n*L + k*L2 + d*L3] * ppharray[K_pph + L][m + n*L + k*L2 + a*L3];
 
                //3)
                k = (K_pph - c + a + L)%L;
 
-               ward -= ppharray[K_pph + L][m + n*L + k*L2 + c*L3] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3];
+               ward += sign * ppharray[K_pph + L][m + n*L + k*L2 + c*L3] * ppharray[K_pph + L][m + n*L + k*L2 + b*L3];
 
                //4)
                k = (K_pph - c + b + L)%L;
