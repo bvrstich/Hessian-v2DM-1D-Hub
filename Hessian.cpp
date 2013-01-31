@@ -446,45 +446,27 @@ void Hessian::T(const PPHM &T){
 
    T.convert(ppharray);
 
-   cout << "converted" << endl;
-
    TPTPM dpt2;
    dpt2.dpt2_pph(ppharray);
-
-   cout << "dpt2'ed" << endl;
 
    TPSPM dptw2;
    dptw2.dptw2(2.0/(Tools::gN() - 1.0),ppharray);
 
-   cout << "dptw2'ed" << endl;
-
    SPSPM dpw4;
    dpw4.dpw4(1.0/( (Tools::gN() - 1.0)*(Tools::gN() - 1.0)),ppharray);
    
-   cout << "dpw4'ed" << endl;
-
    PPHM::convert_st(ppharray);
-
-   cout << "convert_st'ed" << endl;
 
    TPTPM dptw;
    dptw.dptw(ppharray);
    
-   cout << "dptw'ed" << endl;
-
    TPSPM dpw3;
    dpw3.dpw3(2.0/(Tools::gN() - 1.0),ppharray);
 
-   cout << "dpw3'ed" << endl;
-
    PPHM::convert_st2(ppharray);
-
-   cout << "convert_st2'ed" << endl;
 
    TPTPM dpw2;
    dpw2.dpw2(ppharray);
-
-   cout << "dpw2'ed" << endl;
 
    int B,I_i,J_i,B_,K_i,L_i;
 
@@ -532,9 +514,6 @@ void Hessian::T(const PPHM &T){
 
          e_ = Tools::par(e);
          z_ = Tools::par(z);
-
-         //TEST
-         ward = 0.0;
 
          //first the TPTPM parts
          ward = 2.0 * dpt2(i,j) - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
