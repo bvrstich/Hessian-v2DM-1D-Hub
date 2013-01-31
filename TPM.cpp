@@ -871,7 +871,7 @@ void TPM::proj_Tr(){
 
    double ward = (2.0 * this->trace())/(Tools::gM()*(Tools::gM() - 1.0));
 
-   for(int B = 0;B < 2;++B)
+   for(int B = 0;B < gnr();++B)
       for(int i = 0;i < gdim(B);++i)
          (*this)(B,i,i) -= ward;
 

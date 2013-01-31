@@ -32,6 +32,8 @@ using std::ofstream;
  */
 int main(void) {
 
+   srand(0);
+
    cout.precision(10);
 
    const int L = 6;//dim sp hilbert space
@@ -73,7 +75,7 @@ int main(void) {
    //eerst centering
    double gamma = 1.0;
 
-   double tolerance = 1.0e-4;
+   double tolerance = 1.0e-3;
 
    //flag == 0 : initiele centering run (tot op tolerance)
    //flag == 1 : doe een stap met gamma = 0
@@ -85,7 +87,7 @@ int main(void) {
 
    int iter = 0;
 
-   //while(flag != 3){
+   while(flag != 3){
 
       cout << (Z.gI()).trace() << "\t" << pd_gap << "\t" << center_dev << "\t" << energy << endl;
 
@@ -197,7 +199,7 @@ int main(void) {
 
       }
 
-//   }
+   }
 
    cout << endl;
    cout << "FINAL RESULT " << endl;
