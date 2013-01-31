@@ -537,10 +537,10 @@ void Hessian::T(const PPHM &T){
          ward = 0.0;
 
          //first the TPTPM parts
-         //ward = 2.0 * dpt2(i,j) - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
+         ward = 2.0 * dpt2(i,j) - 2.0 * ( dptw(i,j) * TPM::gnorm(a,b) * TPM::gnorm(c,d) + dptw(j,i) * TPM::gnorm(e,z) * TPM::gnorm(t,h) );
        
          ward += 2.0 * TPM::gnorm(a,b) * TPM::gnorm(c,d) * TPM::gnorm(e,z) * TPM::gnorm(t,h) * dpw2(i,j);
-/*
+
          if(I_i == J_i){
 
             if(K_i == L_i)
@@ -556,10 +556,10 @@ void Hessian::T(const PPHM &T){
 
             ward += dptw2(i,e_) + dptw2(i,z_);
 
-           ward -= TPM::gnorm(a,b) * TPM::gnorm(c,d) * ( dpw3(i,e) + dpw3(i,z) );
+            ward -= TPM::gnorm(a,b) * TPM::gnorm(c,d) * ( dpw3(i,e) + dpw3(i,z) );
 
          }
-*/
+
          //the norms
          (*this)(i,j) += ward * Gradient::gnorm(i) * Gradient::gnorm(j) * (2.0*S + 1.0) * (2.0*S_ + 1.0);
 

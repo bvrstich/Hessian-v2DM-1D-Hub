@@ -775,15 +775,15 @@ void TPTPM::dptw(double **ppharray){
 
                K_pph = (k + d + b_)%L;
 
-               ward -= ppharray[K_pph + L][e + z*L + k*L2 + d*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + a*L3]
+               ward += sign * ( ppharray[K_pph + L][e + z*L + k*L2 + d*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + a*L3]
 
-                  + ppharray[K_pph + L][e + z*L + k*L2 + a*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + d*L3];
+                  + ppharray[K_pph + L][e + z*L + k*L2 + a*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + d*L3] );
 
                K_pph = (k + c + a_)%L;
 
-               ward -= ppharray[K_pph + L][e + z*L + k*L2 + c*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + b*L3]
+               ward += sign * ( ppharray[K_pph + L][e + z*L + k*L2 + c*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + b*L3]
 
-                  + ppharray[K_pph + L][e + z*L + k*L2 + b*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + c*L3];
+                  + ppharray[K_pph + L][e + z*L + k*L2 + b*L3] *  ppharray[K_pph + L][t + h*L + k*L2 + c*L3] );
 
                K_pph = (k + c + b_)%L;
 
