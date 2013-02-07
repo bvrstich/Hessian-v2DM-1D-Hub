@@ -32,7 +32,7 @@ using std::ofstream;
  */
 int main(void) {
 
-   srand(0);
+   srand(time(NULL));
 
    cout.precision(10);
 
